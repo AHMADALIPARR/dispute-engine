@@ -70,3 +70,12 @@ merchant catalog: Stripe runs the money (customers, subscriptions,
 checkout, invoices) and mirrors **into** the book — the book is the
 record, the rail is replaceable. Prices are set in the catalog by
 the owner; an unpriced item sells nothing.
+
+## The evidence gate
+
+`metro2/` is the owner's dilute Metro 2 evaluator, included
+verbatim: rules that fire only on independent evidence, human
+review before any letter. `engine/EvidenceGate.jl` bridges it in
+front of the press — pass a dilute evaluation to the campaign and
+only cleared records render. The concentrated engine proposes;
+the dilute engine disposes.

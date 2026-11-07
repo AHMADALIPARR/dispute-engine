@@ -42,7 +42,7 @@ ok('no round id is hardcoded in the components', rounds.every((r) => !consoleSou
 ok('the page mounts the console', mdxSource.includes('<DisputeConsole />'))
 
 const [b1, b2] = board.campaign || []
-ok('board round 1 matches the engine sample run', b1 && b1.targets === 4 && b1.failures === 10 && b1.inquiries === 2 && b1.letters === 2)
+ok('board round 1 matches the engine sample run', b1 && b1.targets === 4 && b1.failures === 11 && b1.inquiries === 2 && b1.letters === 2)
 ok('board round 2 matches the engine sample run', b2 && b2.targets === 2 && b2.failures === 4 && b2.inquiries === 1 && b2.letters === 2)
 ok('board verdict matches the engine', board.verdict === 'HELD -> escalate' && board.chain_valid === true)
 ok('marked exhibit carries marked fields', board.marked_exhibit.fields.some((f) => f.marked))

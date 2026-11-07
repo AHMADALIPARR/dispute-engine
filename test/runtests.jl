@@ -2,6 +2,7 @@ using Test
 
 include(joinpath(@__DIR__, "..", "engine", "DisputeEngine.jl"))
 include(joinpath(@__DIR__, "..", "engine", "CRM.jl"))
+include(joinpath(@__DIR__, "..", "engine", "EvidenceGate.jl"))
 
 root = joinpath(@__DIR__, "..")
 r0 = parse_json(read(joinpath(root, "sample", "report-round0.json"), String))
@@ -33,8 +34,9 @@ end
     # and its last activity predates its opening.
     @test count(==("stale_terms_on_closed"), byid["T5"]) == 2
     @test "date_incoherence" in byid["T5"]
-    @test length(byid["T5"]) == 3
-    @test length(fails) == 10
+    @test length(byid["T5"]) == 4
+    @test "missing_closure_date" in byid["T5"]
+    @test length(fails) == 11
     # Inquiries: two undocumented, one documented control.
     inq = audit_inquiries(r0)
     @test length(inq) == 2
@@ -50,7 +52,7 @@ end
     # Round 1: 4 targets, 10 failures, 2 challenged inquiries,
     # one letter per bureau (Experian + Equifax).
     @test result.board[1].targets == 4
-    @test result.board[1].failures == 10
+    @test result.board[1].failures == 11
     @test result.board[1].inquiries == 2
     @test result.board[1].letters == 2
     # Round 2 on the surviving snapshot: T1/T5 deleted, T2/T4 remain
@@ -100,6 +102,34 @@ end
     @test crm_client(store2, cid)["stripe_customer"] == "cus_SAMPLE"
     @test length(store2.data["events"]) == length(store.data["events"])
     rm(path; force = true)
+end
+
+@testset "evidence gate: the dilute engine guards the press" begin
+    # A gate clearing only T1 and one inquiry (as a dilute evaluation
+    # with human_review_required cases would produce).
+    gatefile = tempname() * ".json"
+    write(gatefile, """{"cases":[
+      {"record_id":"T1","status":"human_review_required"},
+      {"record_id":"INQ:SAMPLE AUTO GROUP","status":"human_review_required"},
+      {"record_id":"T2","status":"needs_evidence"},
+      {"record_id":"T4","status":"needs_evidence"},
+      {"record_id":"T5","status":"needs_evidence"}]}""")
+    gate = load_gate(gatefile)
+    @test gate == Set(["T1", "INQ:SAMPLE AUTO GROUP"])
+    rounds = load_rounds(joinpath(root, "rounds", "rounds.json"))
+    result = run_campaign(rounds, [joinpath(root, "sample", "report-round0.json")]; gate = gate)
+    @test result.board[1].targets == 1
+    @test result.board[1].failures == 2
+    @test result.board[1].inquiries == 1
+    # Two letters: Experian carries T1; Equifax carries the cleared inquiry.
+    @test result.board[1].letters == 2
+    @test result.board[1].gated == 10
+    # A gate that clears nothing renders nothing and says why.
+    write(gatefile, """{"cases":[{"record_id":"T1","status":"needs_evidence"}]}""")
+    result2 = run_campaign(rounds, [joinpath(root, "sample", "report-round0.json")]; gate = load_gate(gatefile))
+    @test result2.board[1].letters == 0
+    @test result2.verdict == "GATED — needs evidence"
+    rm(gatefile; force = true)
 end
 
 @testset "billing catalog: shaped, unpriced, honest" begin

@@ -1,0 +1,445 @@
+{
+  "schema_version": "1.0.0",
+  "engine": "dilute",
+  "mode": "dry_run",
+  "cases": [
+    {
+      "record_id": "edu_01",
+      "rule_id": "R01",
+      "issue": "balance_mismatch",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.servicer_balance_usd",
+          "operator": "exists",
+          "passed": false
+        },
+        {
+          "field": "reported_balance_usd",
+          "operator": "not_equal_field",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "dated_student_loan_statement"
+      ],
+      "proposed_request": "Correct the reported balance to match the dated, relevant servicer records or explain and substantiate the difference.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "15 USC 1681s-2(b)"
+      ]
+    },
+    {
+      "record_id": "edu_01",
+      "rule_id": "R02",
+      "issue": "inaccurate_contact_remark",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "remark",
+          "operator": "equals",
+          "passed": true
+        },
+        {
+          "field": "evidence.address_was_current_at_reporting",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "dated_address_proof",
+        "relevant_contact_record"
+      ],
+      "proposed_request": "Investigate the contactability remark and remove or correct it if inaccurate or misleading.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "edu_01",
+      "rule_id": "R03",
+      "issue": "duplicate_reporting",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.same_obligation_as_account_id",
+          "operator": "exists",
+          "passed": false
+        },
+        {
+          "field": "evidence.duplicate_reporting_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "loan_level_identifiers",
+        "credit_report_pages"
+      ],
+      "proposed_request": "Investigate whether one obligation has been inaccurately reported twice and correct any actual duplication.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "edu_01",
+      "rule_id": "R04",
+      "issue": "payment_status_inaccuracy",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.payment_status_error_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "servicer_payment_history"
+      ],
+      "proposed_request": "Reconcile the account status and payment history against the underlying servicing records.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "12 CFR 1022.43"
+      ]
+    },
+    {
+      "record_id": "edu_02",
+      "rule_id": "R01",
+      "issue": "balance_mismatch",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.servicer_balance_usd",
+          "operator": "exists",
+          "passed": false
+        },
+        {
+          "field": "reported_balance_usd",
+          "operator": "not_equal_field",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "dated_student_loan_statement"
+      ],
+      "proposed_request": "Correct the reported balance to match the dated, relevant servicer records or explain and substantiate the difference.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "15 USC 1681s-2(b)"
+      ]
+    },
+    {
+      "record_id": "edu_02",
+      "rule_id": "R02",
+      "issue": "inaccurate_contact_remark",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "remark",
+          "operator": "equals",
+          "passed": true
+        },
+        {
+          "field": "evidence.address_was_current_at_reporting",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "dated_address_proof",
+        "relevant_contact_record"
+      ],
+      "proposed_request": "Investigate the contactability remark and remove or correct it if inaccurate or misleading.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "edu_02",
+      "rule_id": "R03",
+      "issue": "duplicate_reporting",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.same_obligation_as_account_id",
+          "operator": "exists",
+          "passed": false
+        },
+        {
+          "field": "evidence.duplicate_reporting_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "loan_level_identifiers",
+        "credit_report_pages"
+      ],
+      "proposed_request": "Investigate whether one obligation has been inaccurately reported twice and correct any actual duplication.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "edu_02",
+      "rule_id": "R04",
+      "issue": "payment_status_inaccuracy",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.payment_status_error_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "servicer_payment_history"
+      ],
+      "proposed_request": "Reconcile the account status and payment history against the underlying servicing records.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "12 CFR 1022.43"
+      ]
+    },
+    {
+      "record_id": "edu_03",
+      "rule_id": "R01",
+      "issue": "balance_mismatch",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.servicer_balance_usd",
+          "operator": "exists",
+          "passed": false
+        },
+        {
+          "field": "reported_balance_usd",
+          "operator": "not_equal_field",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "dated_student_loan_statement"
+      ],
+      "proposed_request": "Correct the reported balance to match the dated, relevant servicer records or explain and substantiate the difference.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "15 USC 1681s-2(b)"
+      ]
+    },
+    {
+      "record_id": "edu_03",
+      "rule_id": "R02",
+      "issue": "inaccurate_contact_remark",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "remark",
+          "operator": "equals",
+          "passed": true
+        },
+        {
+          "field": "evidence.address_was_current_at_reporting",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "dated_address_proof",
+        "relevant_contact_record"
+      ],
+      "proposed_request": "Investigate the contactability remark and remove or correct it if inaccurate or misleading.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "edu_03",
+      "rule_id": "R03",
+      "issue": "duplicate_reporting",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.same_obligation_as_account_id",
+          "operator": "exists",
+          "passed": false
+        },
+        {
+          "field": "evidence.duplicate_reporting_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "loan_level_identifiers",
+        "credit_report_pages"
+      ],
+      "proposed_request": "Investigate whether one obligation has been inaccurately reported twice and correct any actual duplication.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "edu_03",
+      "rule_id": "R04",
+      "issue": "payment_status_inaccuracy",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.payment_status_error_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "servicer_payment_history"
+      ],
+      "proposed_request": "Reconcile the account status and payment history against the underlying servicing records.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "12 CFR 1022.43"
+      ]
+    },
+    {
+      "record_id": "affirm_01",
+      "rule_id": "R05",
+      "issue": "closure_date_discrepancy",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "reported_status",
+          "operator": "contains",
+          "passed": true
+        },
+        {
+          "field": "reported_closed_date",
+          "operator": "is_null",
+          "passed": true
+        },
+        {
+          "field": "evidence.actual_closure_date",
+          "operator": "exists",
+          "passed": false
+        },
+        {
+          "field": "evidence.reported_closure_date_is_required_or_materially_misleading",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "affirm_closure_statement",
+        "current_credit_report"
+      ],
+      "proposed_request": "Investigate the absent or inconsistent closure date and correct any materially misleading account information.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "affirm_01",
+      "rule_id": "R06",
+      "issue": "installment_payment_history",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "evidence.payment_history_conflict",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "payment_receipts",
+        "dated_credit_report"
+      ],
+      "proposed_request": "Correct the specific inaccurate payment-history month(s) and associated status fields.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "12 CFR 1022.43"
+      ]
+    },
+    {
+      "record_id": "inq_westlake",
+      "rule_id": "R07",
+      "issue": "potential_unauthorized_inquiry",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "authorized",
+          "operator": "equals",
+          "passed": false
+        },
+        {
+          "field": "evidence.no_application_or_other_permissible_purpose_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "consumer_statement",
+        "report_with_inquiry"
+      ],
+      "proposed_request": "Investigate the identified inquiry and its permissible purpose; remove or correct it if it lacked a permissible purpose or was attributed in error.",
+      "legal_basis": [
+        "15 USC 1681b",
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "inq_ally",
+      "rule_id": "R07",
+      "issue": "potential_unauthorized_inquiry",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "authorized",
+          "operator": "equals",
+          "passed": false
+        },
+        {
+          "field": "evidence.no_application_or_other_permissible_purpose_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "consumer_statement",
+        "report_with_inquiry"
+      ],
+      "proposed_request": "Investigate the identified inquiry and its permissible purpose; remove or correct it if it lacked a permissible purpose or was attributed in error.",
+      "legal_basis": [
+        "15 USC 1681b",
+        "15 USC 1681i"
+      ]
+    },
+    {
+      "record_id": "inq_capitalone",
+      "rule_id": "R07",
+      "issue": "potential_unauthorized_inquiry",
+      "status": "needs_evidence",
+      "checks": [
+        {
+          "field": "authorized",
+          "operator": "equals",
+          "passed": false
+        },
+        {
+          "field": "evidence.no_application_or_other_permissible_purpose_confirmed",
+          "operator": "equals",
+          "passed": false
+        }
+      ],
+      "required_evidence": [
+        "consumer_statement",
+        "report_with_inquiry"
+      ],
+      "proposed_request": "Investigate the identified inquiry and its permissible purpose; remove or correct it if it lacked a permissible purpose or was attributed in error.",
+      "legal_basis": [
+        "15 USC 1681b",
+        "15 USC 1681i"
+      ]
+    }
+  ],
+  "matched_count": 0,
+  "generated_at": null
+}

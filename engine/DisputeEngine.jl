@@ -187,6 +187,10 @@ function audit_tradeline(tl)
         push!(fails, FieldFailure(id, "date_last_activity", "date_incoherence", METRO2,
             "last activity $dla predates the account opening $dop"))
     end
+    if get(f, "account_status", "") == "Closed" && blank(get(f, "closed_date", nothing))
+        push!(fails, FieldFailure(id, "closed_date", "missing_closure_date", METRO2,
+            "closed account reports no closure date"))
+    end
     if get(f, "account_status", "") == "Closed"
         for stale in ("payment_status", "term_length")
             if haskey(f, stale) && !blank(f[stale])
@@ -318,15 +322,24 @@ round at the failures, ingest the next snapshot, audit again. The
 delta between snapshots is the feedback; rounds escalate until no
 failures survive or the snapshots run out.
 """
-function run_campaign(rounds, report_paths)
+function run_campaign(rounds, report_paths; gate = nothing)
     chain = VerdictChain()
     board = []
     reports = [parse_json(read(p, String)) for p in report_paths]
+    total_gated = 0
     for (idx, round) in enumerate(rounds)
         idx <= length(reports) || break
         report = reports[idx]
         failures = audit_report(report)
         inq_all = audit_inquiries(report)
+        gated = 0
+        if gate !== nothing
+            kept_f = gate_filter(failures, gate)
+            kept_i = gate_filter(inq_all, gate)
+            gated = (length(failures) - length(kept_f)) + (length(inq_all) - length(kept_i))
+            failures, inq_all = kept_f, kept_i
+            total_gated += gated
+        end
         failing_ids = unique(fl.tradeline_id for fl in failures)
         tls = Dict(tl["id"] => tl for tl in report["tradelines"])
         bureaus = unique(tls[i]["bureau"] for i in failing_ids)
@@ -359,21 +372,30 @@ function run_campaign(rounds, report_paths)
                 end
             end
         end
-        record = @sprintf("round=%s report=%s targets=%d failures=%d inquiries=%d letters=%d",
-            round["id"], report["report_id"], length(failing_ids), length(failures), length(inq_all), length(letters))
+        record = @sprintf("round=%s report=%s targets=%d failures=%d inquiries=%d gated=%d letters=%d",
+            round["id"], report["report_id"], length(failing_ids), length(failures), length(inq_all), gated, length(letters))
         seal!(chain, record)
         push!(board, (round = round["name"], report = report["report_id"],
                       targets = length(failing_ids), failures = length(failures),
-                      inquiries = length(inq_all),
+                      inquiries = length(inq_all), gated = gated,
                       letters = length(letters), letters_text = letters))
         if isempty(failures) && isempty(inq_all)
-            seal!(chain, "verdict=RESOLVED report=" * report["report_id"])
-            return (board = board, chain = chain, verdict = "RESOLVED")
+            v = (total_gated + gated) > 0 ? "GATED — needs evidence" : "RESOLVED"
+            seal!(chain, "verdict=" * v * " report=" * report["report_id"])
+            return (board = board, chain = chain, verdict = v)
         end
     end
     final = isempty(reports) ? FieldFailure[] : audit_report(reports[end])
     final_inq = isempty(reports) ? FieldFailure[] : audit_inquiries(reports[end])
-    verdict = isempty(final) && isempty(final_inq) ? "RESOLVED" : "HELD -> escalate"
+    if gate !== nothing
+        final = gate_filter(final, gate)
+        final_inq = gate_filter(final_inq, gate)
+    end
+    verdict = if isempty(final) && isempty(final_inq)
+        total_gated > 0 ? "GATED — needs evidence" : "RESOLVED"
+    else
+        "HELD -> escalate"
+    end
     seal!(chain, "verdict=" * verdict)
     return (board = board, chain = chain, verdict = verdict)
 end

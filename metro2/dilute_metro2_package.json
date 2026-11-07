@@ -1,0 +1,386 @@
+{
+  "schema_version": "1.0.0",
+  "engine": "dilute",
+  "package_kind": "metro2_dispute_rules",
+  "disclaimer": "Historical screenshot-derived observations; not current credit-report verification or legal advice. Never fabricate evidence or claim an account is unauthorized without consumer confirmation. Metro 2 is a reporting format, not standalone law.",
+  "consumer": {
+    "name": "Ahmad Ali Parr Jr.",
+    "mailing_address": "{{CURRENT_MAILING_ADDRESS}}",
+    "dob": "{{DOB_OPTIONAL}}",
+    "ssn_last4": "{{SSN_LAST4_OPTIONAL}}",
+    "report_date": "{{REPORT_DATE}}",
+    "dispute_date": "{{DISPUTE_DATE}}"
+  },
+  "source_documents": [
+    {
+      "file": "IMG_2188.jpeg",
+      "type": "user_uploaded_screenshot",
+      "captured_report_period": "2023-2024",
+      "verified_current": false
+    },
+    {
+      "file": "IMG_2187.jpeg",
+      "type": "user_uploaded_screenshot",
+      "captured_report_period": "2023-2024",
+      "verified_current": false
+    },
+    {
+      "file": "IMG_2185.jpeg",
+      "type": "user_uploaded_screenshot",
+      "captured_report_period": "2023-2024",
+      "verified_current": false
+    },
+    {
+      "file": "IMG_2186.jpeg",
+      "type": "user_uploaded_screenshot",
+      "captured_report_period": "2023-2024",
+      "verified_current": false
+    },
+    {
+      "file": "IMG_2184.jpeg",
+      "type": "user_uploaded_screenshot",
+      "captured_report_period": "2023-2024",
+      "verified_current": false
+    },
+    {
+      "file": "IMG_2183.jpeg",
+      "type": "user_uploaded_screenshot",
+      "captured_report_period": "2023-2024",
+      "verified_current": false
+    }
+  ],
+  "records": {
+    "tradelines": [
+      {
+        "id": "edu_01",
+        "bureau": "Experian",
+        "furnisher": "U.S. Department of Education / student loan servicer (confirm exact furnisher)",
+        "type": "student_loan",
+        "account_mask": "35242*** (image-derived; confirm)",
+        "reported_balance_usd": 4300,
+        "reported_high_balance_usd": 3862,
+        "reported_status": "Open / As Agreed",
+        "reported_opened": "2017-04-17",
+        "reported_last_activity": "2023-02-01",
+        "reported_last_verified": "2024-04-06",
+        "reported_date": "2024-04-06",
+        "remark": "CREDIT GRANTOR CANNOT LOCATE CONSUMER",
+        "confidence": "medium",
+        "review_notes": "Screenshot legibility and overlapping versions make exact balance/high balance uncertain; verify original report."
+      },
+      {
+        "id": "edu_02",
+        "bureau": "Experian",
+        "furnisher": "U.S. Department of Education / student loan servicer (confirm exact furnisher)",
+        "type": "student_loan",
+        "account_mask": "35242*** (image-derived; confirm)",
+        "reported_balance_usd": 4280,
+        "reported_high_balance_usd": 3447,
+        "reported_status": "Open / As Agreed",
+        "reported_opened": "2017-04-17",
+        "reported_last_activity": "2023-02-01",
+        "reported_last_verified": "2024-04-06",
+        "reported_date": "2024-04-06",
+        "remark": "CREDIT GRANTOR CANNOT LOCATE CONSUMER",
+        "confidence": "low",
+        "review_notes": "May be separate loan or a second snapshot: masked identifiers are insufficient to deduplicate."
+      },
+      {
+        "id": "edu_03",
+        "bureau": "Experian",
+        "furnisher": "U.S. Department of Education / student loan servicer (confirm exact furnisher)",
+        "type": "student_loan",
+        "account_mask": "352420*** (image-derived; confirm)",
+        "reported_balance_usd": 4242,
+        "reported_high_balance_usd": 3468,
+        "reported_status": "Open / As Agreed",
+        "reported_opened": "2017-04-17",
+        "reported_last_activity": "2023-02-01",
+        "reported_last_verified": "2024-04-06",
+        "reported_date": "2024-04-06",
+        "remark": "CREDIT GRANTOR CANNOT LOCATE CONSUMER",
+        "confidence": "medium",
+        "review_notes": "May be same student loan as another screenshot, with changed balance; do not claim duplicate without full account match."
+      },
+      {
+        "id": "affirm_01",
+        "bureau": "Experian",
+        "furnisher": "Affirm Inc.",
+        "type": "installment",
+        "account_mask": "E46YI6** (visual transcription; confirm)",
+        "reported_balance_usd": 0,
+        "reported_high_balance_usd": 265,
+        "reported_status": "Closed / As Agreed",
+        "reported_opened": "2024-01-10",
+        "reported_last_activity": "2024-01-01",
+        "reported_last_verified": "2024-01-16",
+        "reported_date": "2024-01-16",
+        "reported_closed_date": null,
+        "reported_term_length": 5,
+        "confidence": "medium",
+        "review_notes": "Blank closed date alone is not conclusive error; need records and current report."
+      }
+    ],
+    "inquiries": [
+      {
+        "id": "inq_westlake",
+        "bureau": "Equifax",
+        "company": "Westlake Services Inc.",
+        "inquiry_date": "2023-06-17",
+        "authorized": null
+      },
+      {
+        "id": "inq_ally",
+        "bureau": "Equifax",
+        "company": "Ally Financial",
+        "inquiry_date": "2023-06-09",
+        "authorized": null
+      },
+      {
+        "id": "inq_capitalone",
+        "bureau": "Equifax",
+        "company": "Capital One",
+        "inquiry_date": "2023-06-09",
+        "authorized": null
+      }
+    ]
+  },
+  "rules": [
+    {
+      "id": "R01",
+      "target": "student_loan",
+      "condition": {
+        "all": [
+          {
+            "field": "evidence.servicer_balance_usd",
+            "operator": "exists"
+          },
+          {
+            "field": "reported_balance_usd",
+            "operator": "not_equal_field",
+            "value": "evidence.servicer_balance_usd"
+          }
+        ]
+      },
+      "issue": "balance_mismatch",
+      "severity": "high",
+      "request": "Correct the reported balance to match the dated, relevant servicer records or explain and substantiate the difference.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "15 USC 1681s-2(b)"
+      ],
+      "evidence_required": [
+        "dated_student_loan_statement"
+      ],
+      "human_review": true
+    },
+    {
+      "id": "R02",
+      "target": "student_loan",
+      "condition": {
+        "all": [
+          {
+            "field": "remark",
+            "operator": "equals",
+            "value": "CREDIT GRANTOR CANNOT LOCATE CONSUMER"
+          },
+          {
+            "field": "evidence.address_was_current_at_reporting",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "issue": "inaccurate_contact_remark",
+      "severity": "medium",
+      "request": "Investigate the contactability remark and remove or correct it if inaccurate or misleading.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ],
+      "evidence_required": [
+        "dated_address_proof",
+        "relevant_contact_record"
+      ],
+      "human_review": true
+    },
+    {
+      "id": "R03",
+      "target": "student_loan",
+      "condition": {
+        "all": [
+          {
+            "field": "evidence.same_obligation_as_account_id",
+            "operator": "exists"
+          },
+          {
+            "field": "evidence.duplicate_reporting_confirmed",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "issue": "duplicate_reporting",
+      "severity": "high",
+      "request": "Investigate whether one obligation has been inaccurately reported twice and correct any actual duplication.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ],
+      "evidence_required": [
+        "loan_level_identifiers",
+        "credit_report_pages"
+      ],
+      "human_review": true
+    },
+    {
+      "id": "R04",
+      "target": "student_loan",
+      "condition": {
+        "all": [
+          {
+            "field": "evidence.payment_status_error_confirmed",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "issue": "payment_status_inaccuracy",
+      "severity": "high",
+      "request": "Reconcile the account status and payment history against the underlying servicing records.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "12 CFR 1022.43"
+      ],
+      "evidence_required": [
+        "servicer_payment_history"
+      ],
+      "human_review": true
+    },
+    {
+      "id": "R05",
+      "target": "installment",
+      "condition": {
+        "all": [
+          {
+            "field": "reported_status",
+            "operator": "contains",
+            "value": "Closed"
+          },
+          {
+            "field": "reported_closed_date",
+            "operator": "is_null"
+          },
+          {
+            "field": "evidence.actual_closure_date",
+            "operator": "exists"
+          },
+          {
+            "field": "evidence.reported_closure_date_is_required_or_materially_misleading",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "issue": "closure_date_discrepancy",
+      "severity": "medium",
+      "request": "Investigate the absent or inconsistent closure date and correct any materially misleading account information.",
+      "legal_basis": [
+        "15 USC 1681i"
+      ],
+      "evidence_required": [
+        "affirm_closure_statement",
+        "current_credit_report"
+      ],
+      "human_review": true
+    },
+    {
+      "id": "R06",
+      "target": "installment",
+      "condition": {
+        "all": [
+          {
+            "field": "evidence.payment_history_conflict",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "issue": "installment_payment_history",
+      "severity": "high",
+      "request": "Correct the specific inaccurate payment-history month(s) and associated status fields.",
+      "legal_basis": [
+        "15 USC 1681i",
+        "12 CFR 1022.43"
+      ],
+      "evidence_required": [
+        "payment_receipts",
+        "dated_credit_report"
+      ],
+      "human_review": true
+    },
+    {
+      "id": "R07",
+      "target": "inquiry",
+      "condition": {
+        "all": [
+          {
+            "field": "authorized",
+            "operator": "equals",
+            "value": false
+          },
+          {
+            "field": "evidence.no_application_or_other_permissible_purpose_confirmed",
+            "operator": "equals",
+            "value": true
+          }
+        ]
+      },
+      "issue": "potential_unauthorized_inquiry",
+      "severity": "high",
+      "request": "Investigate the identified inquiry and its permissible purpose; remove or correct it if it lacked a permissible purpose or was attributed in error.",
+      "legal_basis": [
+        "15 USC 1681b",
+        "15 USC 1681i"
+      ],
+      "evidence_required": [
+        "consumer_statement",
+        "report_with_inquiry"
+      ],
+      "human_review": true
+    }
+  ],
+  "letter_templates": {
+    "experian_student_loan": "{{DISPUTE_DATE}}\n{{CONSUMER_NAME}}\n{{CURRENT_MAILING_ADDRESS}}\n\nExperian\nP.O. Box 9701\nAllen, TX 75013\n\nRe: Specific dispute of U.S. Department of Education student-loan tradeline(s)\n\nTo Experian Dispute Department:\n\nI dispute the accuracy or completeness of the following student-loan reporting appearing on my Experian report dated {{REPORT_DATE}}: {{ACCOUNT_IDENTIFIERS}}. The issues requiring reinvestigation are: {{VERIFIED_ISSUES}}. My supporting documents are {{EVIDENCE_LIST}}.\n\nPlease conduct a reasonable reinvestigation under 15 U.S.C. § 1681i, forward the substance of each specific issue and my supporting evidence to the furnisher as required, and determine whether the balance, payment status, dates, account identification, and any contactability remark are accurate and complete. Please provide the written results, an updated report if changes are made, and a description of the procedure used to determine accuracy if I subsequently request it. Correct or delete only information that is inaccurate, incomplete, or cannot be verified through a reasonable reinvestigation as required by applicable law.\n\nThis letter does not assert that separate student loans are duplicates solely because their masked numbers look alike. Please investigate the specific documented discrepancies identified above.\n\nSincerely,\n{{CONSUMER_NAME}}",
+    "experian_affirm": "{{DISPUTE_DATE}}\n{{CONSUMER_NAME}}\n{{CURRENT_MAILING_ADDRESS}}\n\nExperian\nP.O. Box 9701\nAllen, TX 75013\n\nRe: Affirm Inc. installment tradeline — {{ACCOUNT_IDENTIFIERS}}\n\nTo Experian Dispute Department:\n\nI am disputing these specific aspects of the Affirm tradeline on my Experian report dated {{REPORT_DATE}}: {{VERIFIED_ISSUES}}. The report extract I retained shows a $0 balance, a closed status, and no closure date in the displayed field. I am not asserting that a blank field alone establishes a legal violation. Rather, please compare the tradeline against the enclosed account records: {{EVIDENCE_LIST}}.\n\nPlease reinvestigate the particular discrepancies identified, review my supporting records, and correct any inaccurate or materially misleading data. If an item cannot be verified after a reasonable reinvestigation, please take the action required under 15 U.S.C. § 1681i and provide written results.\n\nSincerely,\n{{CONSUMER_NAME}}",
+    "equifax_inquiries": "{{DISPUTE_DATE}}\n{{CONSUMER_NAME}}\n{{CURRENT_MAILING_ADDRESS}}\n\nEquifax Information Services LLC\nP.O. Box 740241\nAtlanta, GA 30374\n\nRe: Dispute of identified inquiry records\n\nTo Equifax Dispute Department:\n\nI am disputing the following specifically identified inquiry entries on my Equifax report dated {{REPORT_DATE}}: {{ACCOUNT_IDENTIFIERS}}. For each listed entry, my factual reason for disputing it is: {{VERIFIED_ISSUES}}. I have included {{EVIDENCE_LIST}}.\n\nPlease reinvestigate whether each inquiry is accurately attributed to my file and whether a permissible purpose under 15 U.S.C. § 1681b existed. If an inquiry was entered in error or cannot be verified as accurate in the context of this dispute, please correct or remove it as applicable. Please provide the written outcome of your reinvestigation under 15 U.S.C. § 1681i.\n\nSincerely,\n{{CONSUMER_NAME}}",
+    "furnisher_direct_dispute": "{{DISPUTE_DATE}}\n{{CONSUMER_NAME}}\n{{CURRENT_MAILING_ADDRESS}}\n\n{{FURNISHER_NAME}}\n{{FURNISHER_DISPUTE_ADDRESS}}\n\nRe: Direct dispute — {{ACCOUNT_IDENTIFIERS}}\n\nTo the Dispute Department:\n\nPursuant to 12 C.F.R. § 1022.43, I dispute the following specific information you furnished concerning my account: {{VERIFIED_ISSUES}}. The information is disputed because {{FACTUAL_BASIS}}. Enclosed are {{EVIDENCE_LIST}}.\n\nPlease conduct a reasonable investigation, consider all relevant materials, report the results to me, and notify every consumer reporting agency to which you provided information that your investigation determines was inaccurate, with the corrections required by law.\n\nSincerely,\n{{CONSUMER_NAME}}"
+  },
+  "workflow": {
+    "stages": [
+      "ingest",
+      "normalize",
+      "deduplicate_candidates",
+      "compare_to_external_evidence",
+      "run_rules",
+      "human_confirm",
+      "render_drafts",
+      "send_manually",
+      "track_deadlines",
+      "reconcile_results"
+    ],
+    "default_case_state": "needs_evidence",
+    "rule_match_requires_all_predicates": true,
+    "unknown_never_equals_false": true,
+    "disable_auto_send": true,
+    "no_fraud_inference": true,
+    "duplicate_match_requires_loan_identifiers": true,
+    "address_must_be_verified_before_mail": true,
+    "inquiry_disputes_route_to_cra_not_1022_43_direct_dispute": true,
+    "result_deadline_days_default": 30,
+    "result_deadline_days_may_be_extended": 45
+  },
+  "regulatory_sources": {
+    "FCRA_CRA_dispute": "https://www.consumerfinance.gov/ask-cfpb/how-long-does-it-take-to-repair-an-error-on-my-credit-report-en-1339/",
+    "direct_furnisher_dispute": "https://www.consumerfinance.gov/rules-policy/regulations/1022/43/",
+    "metro2_standard": "https://www.cdiaonline.org/resources/furnishers-of-data-overview/metro2-information/"
+  }
+}

@@ -52,3 +52,24 @@ Local repository, not pushed. Built 2026-11-07.
   the connector: not_connected). The connect flow is OAuth; no keys
   are stored in this repository or anywhere in the stack.
 - Console: clients board + merchant panel added; check 17/17.
+
+## Stage 3 — the owner's dilute engine, integrated (2026-11-07)
+
+- `metro2/` holds the owner's Dilute Metro 2 Dispute Engine
+  verbatim (evidence-gated rules R01–R07, evaluator, four letter
+  templates, dry-run output, draft letters): seven rules that fire
+  only when independent evidence satisfies every predicate; anything
+  less is `needs_evidence`, and a fired case is
+  `human_review_required`, never auto-sent. Its own suite passes
+  (`node metro2/test.mjs`); its dry run reproduces byte-identically
+  (matched_count 0 — unsubstantiated flags become no disputes).
+- PII scan of the package before inclusion: no SSN, DOB, street
+  address, full account numbers, or emails in any file.
+- Bridge (`engine/EvidenceGate.jl`): a campaign run with
+  `gate = load_gate(evaluation.json)` renders letters only for
+  records the dilute engine cleared; everything else is counted as
+  gated, and a fully gated campaign ends GATED — needs evidence.
+  Gate suite: 8/8. Total Julia suite: 66/66.
+- The audit also gained his R05's sibling rule from this stage:
+  missing_closure_date (closed account, no closure date). Sample
+  round-0 failures are now 11; the console board matches.
