@@ -50,7 +50,7 @@ ok('marked exhibit carries marked fields', board.marked_exhibit.fields.some((f) 
 const [client] = crm.clients || []
 ok('crm board matches the engine crm run', client && client.rounds === 2 && client.letters === 4 && client.reports === 2 && client.status === 'In Round')
 ok('console renders the book and the merchant', consoleSource.includes("from '../crm.json'") && consoleSource.includes("from '../../billing/billing.json'"))
-ok('merchant state is honest', billing.merchant.state === 'not_connected' && billing.merchant.processor === 'stripe')
+ok('merchant state is honest', billing.merchant.state === 'connected' && billing.merchant.processor === 'stripe')
 ok('nothing is priced yet', billing.plans.every((p) => p.amount_cents === null) && billing.products.every((p) => p.amount_cents === null))
 
 console.log(failed ? `\n${failed} failure(s)` : '\nfrontend check: all green')

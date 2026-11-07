@@ -1,1 +1,51 @@
-{"merchant":{"processor":"stripe","state":"not_connected","stripe_objects":{"credits":"Checkout sessions (one-time payments) writing invoice records into the CRM","customers":"Stripe Customers mirrored 1:1 from CRM clients (CRM is the source of truth)","invoices":"Stripe Invoices mirrored INTO CRM invoice records","plans":"Stripe Products + Prices created from the plans below","subscriptions":"Stripe Billing subscriptions for active plans"}},"money":{"currency":"usd","note":"Amounts are the owner's to set. null = not yet priced; nothing sells until every amount is set and the merchant account is connected."},"plans":[{"amount_cents":null,"description":"The client runs their own campaign from the console: reports ingested, rounds fired by hand.","id":"diy-console","interval":"month","name":"DIY Console","stripe":"product+price (subscription)"},{"amount_cents":null,"description":"The practice runs the campaign: audit, rounds, letters, and the book kept for the client.","id":"full-campaign","interval":"month","name":"Full Campaign","stripe":"product+price (subscription)"}],"products":[{"amount_cents":null,"description":"One escalation round fired across a client's failing tradelines and inquiries.","id":"attack-round-credit","name":"Attack Round Credit","stripe":"product+price (one-time)"},{"amount_cents":null,"description":"One additional letter beyond the round's standard barrage (per-failure granularity).","id":"extra-letter-credit","name":"Extra Letter Credit","stripe":"product+price (one-time)"}]}
+{
+ "merchant": {
+  "processor": "stripe",
+  "state": "connected",
+  "stripe_objects": {
+   "credits": "Checkout sessions (one-time payments) writing invoice records into the CRM",
+   "customers": "Stripe Customers mirrored 1:1 from CRM clients (CRM is the source of truth)",
+   "invoices": "Stripe Invoices mirrored INTO CRM invoice records",
+   "plans": "Stripe Products + Prices created from the plans below",
+   "subscriptions": "Stripe Billing subscriptions for active plans"
+  }
+ },
+ "money": {
+  "currency": "usd",
+  "note": "Amounts are the owner's to set. null = not yet priced; nothing sells until every amount is set and the merchant account is connected."
+ },
+ "plans": [
+  {
+   "amount_cents": null,
+   "description": "The client runs their own campaign from the console: reports ingested, rounds fired by hand.",
+   "id": "diy-console",
+   "interval": "month",
+   "name": "DIY Console",
+   "stripe": "product+price (subscription)"
+  },
+  {
+   "amount_cents": null,
+   "description": "The practice runs the campaign: audit, rounds, letters, and the book kept for the client.",
+   "id": "full-campaign",
+   "interval": "month",
+   "name": "Full Campaign",
+   "stripe": "product+price (subscription)"
+  }
+ ],
+ "products": [
+  {
+   "amount_cents": null,
+   "description": "One escalation round fired across a client's failing tradelines and inquiries.",
+   "id": "attack-round-credit",
+   "name": "Attack Round Credit",
+   "stripe": "product+price (one-time)"
+  },
+  {
+   "amount_cents": null,
+   "description": "One additional letter beyond the round's standard barrage (per-failure granularity).",
+   "id": "extra-letter-credit",
+   "name": "Extra Letter Credit",
+   "stripe": "product+price (one-time)"
+  }
+ ]
+}

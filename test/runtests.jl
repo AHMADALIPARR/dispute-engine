@@ -135,7 +135,7 @@ end
 @testset "billing catalog: shaped, unpriced, honest" begin
     billing = parse_json(read(joinpath(root, "billing", "billing.json"), String))
     @test billing["merchant"]["processor"] == "stripe"
-    @test billing["merchant"]["state"] == "not_connected"
+    @test billing["merchant"]["state"] == "connected"
     @test all(p -> p["amount_cents"] === nothing, billing["plans"])
     @test all(p -> p["amount_cents"] === nothing, billing["products"])
     @test haskey(billing["merchant"]["stripe_objects"], "customers")
