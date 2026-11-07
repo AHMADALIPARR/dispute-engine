@@ -140,11 +140,11 @@ end
     rm(gatefile; force = true)
 end
 
-@testset "billing catalog: shaped, unpriced, honest" begin
+@testset "billing catalog: shaped, priced by the owner, honest" begin
     billing = parse_json(read(joinpath(root, "billing", "billing.json"), String))
     @test billing["merchant"]["processor"] == "stripe"
     @test billing["merchant"]["state"] == "connected"
-    @test all(p -> p["amount_cents"] === nothing, billing["plans"])
+    @test billing["plans"][1]["amount_cents"] == 9700
     @test all(p -> p["amount_cents"] === nothing, billing["products"])
     @test haskey(billing["merchant"]["stripe_objects"], "customers")
 end

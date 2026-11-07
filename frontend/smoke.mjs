@@ -61,7 +61,7 @@ try {
   check('seal letters are drafts', seal.campaigns.sample.rounds[0].letter_text[0].includes('[CONSUMER ADDRESS]') && seal.campaigns.sample.rounds[0].letter_text[0].includes('\u2022\u2022420'))
 
   const billing = JSON.parse((await get('billing/billing.json')).body)
-  check('catalog is unpriced', billing.plans.every((plan) => plan.amount_cents === null))
+  check('catalog priced at the owner-named fee', billing.plans.length === 1 && billing.plans[0].amount_cents === 9700)
 
   const scanned = [
     index.body,
