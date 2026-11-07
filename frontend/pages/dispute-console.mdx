@@ -23,4 +23,10 @@ remove it, or produce physical proof of the purpose.
 Every round seals into a hash-chained verdict log. The bureau never
 grades its own record. The audit does.
 
+The runnable console is `index.html` at the repository root. GitHub
+Pages serves that file and does not execute Julia. The page runs the
+browser port in `frontend/site/engine.mjs`, which the integration
+test locks to `julia engine/export_campaign.jl`. Drafts stay on the
+device. Nothing on that page is mailed.
+
 <DisputeConsole />

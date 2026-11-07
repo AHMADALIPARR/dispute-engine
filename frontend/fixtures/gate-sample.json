@@ -1,0 +1,9 @@
+{
+  "cases": [
+    {"record_id": "T1", "status": "human_review_required"},
+    {"record_id": "INQ:SAMPLE AUTO GROUP", "status": "human_review_required"},
+    {"record_id": "T2", "status": "needs_evidence"},
+    {"record_id": "T4", "status": "needs_evidence"},
+    {"record_id": "T5", "status": "needs_evidence"}
+  ]
+}
