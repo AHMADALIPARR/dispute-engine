@@ -88,9 +88,9 @@ export function DisputeConsole() {
       </div>
       <div style={{ padding: '6px 18px 10px', fontSize: 13 }}>
         <div>
-          Plans: {billing.plans.map((p) => p.name).join(' · ')} — prices are the owner's to
-          set (unset prices sell nothing). Credits:{' '}
-          {billing.products.map((p) => p.name).join(' · ')}.
+          One flat subscription: {billing.plans.map((p) => p.name).join(' · ')} — the whole
+          engine, no per-round credits, no tiers. The fee is the owner's to name; unpriced
+          sells nothing.
         </div>
         <div style={{ color: '#6d7690' }}>
           Stripe runs the money: customers, subscriptions, checkout, invoices. The CRM is

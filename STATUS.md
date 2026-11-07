@@ -73,3 +73,14 @@ Local repository, not pushed. Built 2026-11-07.
 - The audit also gained his R05's sibling rule from this stage:
   missing_closure_date (closed account, no closure date). Sample
   round-0 failures are now 11; the console board matches.
+
+## Pricing model decision (owner, 2026-11-07)
+
+- The collectivekitty.com tier prices were never self-serve
+  products: they were custom-contact signals — reach out, and the
+  owner builds you your own airgapped system. That inbound model
+  is retired for this product.
+- The dispute engine sells as ONE flat fee on a subscription
+  basis: billing.json now carries a single plan
+  (dispute-engine-flat); per-round credits and tiered plans are
+  removed. Amount still null pending the owner's number.

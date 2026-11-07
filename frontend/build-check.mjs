@@ -51,7 +51,8 @@ const [client] = crm.clients || []
 ok('crm board matches the engine crm run', client && client.rounds === 2 && client.letters === 4 && client.reports === 2 && client.status === 'In Round')
 ok('console renders the book and the merchant', consoleSource.includes("from '../crm.json'") && consoleSource.includes("from '../../billing/billing.json'"))
 ok('merchant state is honest', billing.merchant.state === 'connected' && billing.merchant.processor === 'stripe')
-ok('nothing is priced yet', billing.plans.every((p) => p.amount_cents === null) && billing.products.every((p) => p.amount_cents === null))
+ok('nothing is priced yet', billing.plans.every((p) => p.amount_cents === null) && (billing.products || []).every((p) => p.amount_cents === null))
+ok('one flat subscription, no tiers', billing.plans.length === 1 && billing.plans[0].id === 'dispute-engine-flat')
 
 console.log(failed ? `\n${failed} failure(s)` : '\nfrontend check: all green')
 process.exit(failed ? 1 : 0)
