@@ -38,3 +38,17 @@ Local repository, not pushed. Built 2026-11-07.
   software. Mailing stays a human act, as it was with the letters.
 - The audit encodes the owner's dispute rules as shown in his
   letters; it is a document engine, not legal advice.
+
+## Stage 2 — CRM + merchant rail (2026-11-07)
+
+- CRM (engine/CRM.jl): the client book — clients, reports,
+  campaigns, invoices — on a local JSON store with its own writer;
+  every event seals into the verdict chain. Suite now 57/57.
+- Billing (billing/billing.json): the Stripe object map (customers
+  mirror from the CRM, subscriptions for plans, Checkout for
+  credits, invoices mirror into the book). All amounts are null:
+  pricing is the owner's decision, and unset prices sell nothing.
+- Stripe merchant account: NOT connected at build time (checked via
+  the connector: not_connected). The connect flow is OAuth; no keys
+  are stored in this repository or anywhere in the stack.
+- Console: clients board + merchant panel added; check 17/17.

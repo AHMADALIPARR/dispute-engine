@@ -60,3 +60,13 @@ cd frontend && npm run check      # MDX compile + contract check
 Ingest format is the credit-report JSON export (the same shape the
 owner's Panda workflow produced: report .html/.json). Sample
 reports under `sample/` are synthetic.
+
+## The book and the rail
+
+`engine/CRM.jl` is the client book: clients, their reports,
+campaigns, letters, and invoices, kept locally with every event
+sealed into the verdict chain. `billing/billing.json` is the
+merchant catalog: Stripe runs the money (customers, subscriptions,
+checkout, invoices) and mirrors **into** the book — the book is the
+record, the rail is replaceable. Prices are set in the catalog by
+the owner; an unpriced item sells nothing.

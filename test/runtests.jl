@@ -1,6 +1,7 @@
 using Test
 
 include(joinpath(@__DIR__, "..", "engine", "DisputeEngine.jl"))
+include(joinpath(@__DIR__, "..", "engine", "CRM.jl"))
 
 root = joinpath(@__DIR__, "..")
 r0 = parse_json(read(joinpath(root, "sample", "report-round0.json"), String))
@@ -69,6 +70,45 @@ end
     @test occursin("CFPB, FTC and my Attorney General", alltext)
     @test occursin("intentional disregard of my rights", alltext)
     @test occursin("permissible purpose", alltext)
+end
+
+@testset "crm: the book keeps the practice" begin
+    path = tempname() * ".json"
+    store = crm_load(path)
+    chain = VerdictChain()
+    cid = crm_add_client!(store, chain; name = "SAMPLE CONSUMER", email = "sample@example.com")
+    @test crm_add_client!(store, chain; name = "SAMPLE CONSUMER", email = "sample@example.com") == cid
+    crm_attach_report!(store, chain, cid, "SAMPLE-R0")
+    crm_attach_report!(store, chain, cid, "SAMPLE-R1")
+    rounds = load_rounds(joinpath(root, "rounds", "rounds.json"))
+    result = run_campaign(rounds, [joinpath(root, "sample", "report-round0.json"),
+                                   joinpath(root, "sample", "report-round1.json")])
+    letters = crm_record_campaign!(store, chain, cid, result)
+    @test letters == 4
+    crm_add_invoice!(store, chain, cid; description = "Attack Round Credit x2", amount_cents = 0)
+    crm_link_stripe_customer!(store, chain, cid, "cus_SAMPLE")
+    s = crm_summary(store, cid)
+    @test s.status == "In Round"
+    @test s.reports == 2
+    @test s.rounds == 2
+    @test s.letters == 4
+    @test s.open_balance_cents == 0
+    # The book survives a save/load round trip through its own writer+reader.
+    crm_save(store)
+    store2 = crm_load(path)
+    @test crm_summary(store2, cid) == s
+    @test crm_client(store2, cid)["stripe_customer"] == "cus_SAMPLE"
+    @test length(store2.data["events"]) == length(store.data["events"])
+    rm(path; force = true)
+end
+
+@testset "billing catalog: shaped, unpriced, honest" begin
+    billing = parse_json(read(joinpath(root, "billing", "billing.json"), String))
+    @test billing["merchant"]["processor"] == "stripe"
+    @test billing["merchant"]["state"] == "not_connected"
+    @test all(p -> p["amount_cents"] === nothing, billing["plans"])
+    @test all(p -> p["amount_cents"] === nothing, billing["products"])
+    @test haskey(billing["merchant"]["stripe_objects"], "customers")
 end
 
 @testset "verdict chain: tamper refused" begin

@@ -1,6 +1,8 @@
 import React from 'react'
 import roundsDoc from '../../rounds/rounds.json'
+import billing from '../../billing/billing.json'
 import board from '../board.json'
+import crm from '../crm.json'
 import { RoundToggle } from './RoundToggle.jsx'
 
 /**
@@ -50,6 +52,49 @@ export function DisputeConsole() {
         </table>
         <div className="dx-verdict">
           OVERALL: {board.verdict} · verdict chain valid: {String(board.chain_valid)}
+        </div>
+      </div>
+
+      <div className="dx-section-title">CLIENTS — THE BOOK</div>
+      <div style={{ padding: '6px 18px 10px' }}>
+        <table className="dx-board">
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Status</th>
+              <th>Reports</th>
+              <th>Rounds</th>
+              <th>Letters</th>
+              <th>Open balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {crm.clients.map((c) => (
+              <tr key={c.name}>
+                <td>{c.name}</td>
+                <td>{c.status}</td>
+                <td>{c.reports}</td>
+                <td>{c.rounds}</td>
+                <td>{c.letters}</td>
+                <td>{c.open_balance}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="dx-section-title">
+        MERCHANT — {billing.merchant.processor.toUpperCase()} · {billing.merchant.state.replace('_', ' ').toUpperCase()}
+      </div>
+      <div style={{ padding: '6px 18px 10px', fontSize: 13 }}>
+        <div>
+          Plans: {billing.plans.map((p) => p.name).join(' · ')} — prices are the owner's to
+          set (unset prices sell nothing). Credits:{' '}
+          {billing.products.map((p) => p.name).join(' · ')}.
+        </div>
+        <div style={{ color: '#6d7690' }}>
+          Stripe runs the money: customers, subscriptions, checkout, invoices. The CRM is
+          the book of record — Stripe mirrors into it, never the other way.
         </div>
       </div>
 

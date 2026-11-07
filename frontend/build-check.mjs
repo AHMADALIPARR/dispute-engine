@@ -18,6 +18,8 @@ const ok = (name, cond) => {
 
 const mdxSource = readFileSync(new URL('./pages/dispute-console.mdx', import.meta.url), 'utf8')
 const roundsDoc = JSON.parse(readFileSync(new URL('../rounds/rounds.json', import.meta.url), 'utf8'))
+const billing = JSON.parse(readFileSync(new URL('../billing/billing.json', import.meta.url), 'utf8'))
+const crm = JSON.parse(readFileSync(new URL('./crm.json', import.meta.url), 'utf8'))
 const board = JSON.parse(readFileSync(new URL('./board.json', import.meta.url), 'utf8'))
 const consoleSource = readFileSync(new URL('./components/DisputeConsole.jsx', import.meta.url), 'utf8')
 const toggleSource = readFileSync(new URL('./components/RoundToggle.jsx', import.meta.url), 'utf8')
@@ -44,6 +46,12 @@ ok('board round 1 matches the engine sample run', b1 && b1.targets === 4 && b1.f
 ok('board round 2 matches the engine sample run', b2 && b2.targets === 2 && b2.failures === 4 && b2.inquiries === 1 && b2.letters === 2)
 ok('board verdict matches the engine', board.verdict === 'HELD -> escalate' && board.chain_valid === true)
 ok('marked exhibit carries marked fields', board.marked_exhibit.fields.some((f) => f.marked))
+
+const [client] = crm.clients || []
+ok('crm board matches the engine crm run', client && client.rounds === 2 && client.letters === 4 && client.reports === 2 && client.status === 'In Round')
+ok('console renders the book and the merchant', consoleSource.includes("from '../crm.json'") && consoleSource.includes("from '../../billing/billing.json'"))
+ok('merchant state is honest', billing.merchant.state === 'not_connected' && billing.merchant.processor === 'stripe')
+ok('nothing is priced yet', billing.plans.every((p) => p.amount_cents === null) && billing.products.every((p) => p.amount_cents === null))
 
 console.log(failed ? `\n${failed} failure(s)` : '\nfrontend check: all green')
 process.exit(failed ? 1 : 0)
