@@ -1,0 +1,84 @@
+/* Soul Forge Eval — console styling.
+   The SnapOS panel language: near-black ground, thin panel borders,
+   monospace readouts, one accent for live state, one for held state. */
+
+.sf-panel {
+  background: #0b0e17;
+  border: 1px solid #232838;
+  border-radius: 10px;
+  color: #d7dcea;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  max-width: 860px;
+  padding: 0;
+}
+
+.sf-panel-head {
+  align-items: baseline;
+  border-bottom: 1px solid #232838;
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 18px;
+}
+
+.sf-panel-title { color: #f2f4fa; letter-spacing: 0.08em; }
+.sf-panel-meta { color: #6d7690; font-size: 12px; }
+.sf-panel-body { display: flex; flex-direction: column; }
+.sf-panel-foot {
+  border-top: 1px solid #232838;
+  color: #6d7690;
+  font-size: 12px;
+  padding: 12px 18px;
+}
+
+.sf-toggle-row {
+  align-items: center;
+  border-bottom: 1px solid #171b29;
+  display: flex;
+  gap: 14px;
+  padding: 14px 18px;
+}
+
+.sf-toggle {
+  background: #171b29;
+  border: 1px solid #2c3247;
+  border-radius: 999px;
+  cursor: pointer;
+  height: 24px;
+  position: relative;
+  width: 46px;
+}
+
+.sf-toggle-knob {
+  background: #6d7690;
+  border-radius: 50%;
+  height: 16px;
+  left: 3px;
+  position: absolute;
+  top: 3px;
+  transition: left 120ms ease, background 120ms ease;
+  width: 16px;
+}
+
+.sf-toggle-on { border-color: #2fbf71; }
+.sf-toggle-on .sf-toggle-knob { background: #2fbf71; left: 25px; }
+.sf-toggle-off .sf-toggle-knob { background: #565e75; }
+
+.sf-toggle-text { flex: 1; }
+.sf-toggle-title { color: #eef1f8; font-size: 14px; }
+.sf-toggle-kind { color: #6d7690; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+.sf-toggle-desc { color: #9aa3ba; font-size: 12px; margin-top: 3px; }
+.sf-toggle-state { color: #2fbf71; font-size: 11px; letter-spacing: 0.12em; }
+.sf-toggle-row:has(.sf-toggle-off) .sf-toggle-state { color: #e0a83c; }
+
+/* Dispute console additions: the campaign board and the highlighter.
+   The green mark is the owner's own: a field the audit marked is a
+   field the letter attacks. */
+.dx-board { border-collapse: collapse; font-size: 13px; width: 100%; }
+.dx-board th { color: #6d7690; font-weight: normal; text-align: left; padding: 6px 10px; border-bottom: 1px solid #232838; }
+.dx-board td { padding: 6px 10px; border-bottom: 1px solid #171c2b; }
+.dx-verdict { color: #ffb454; letter-spacing: 0.06em; }
+.dx-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 18px; font-size: 13px; padding: 10px 18px; }
+.dx-field { display: flex; justify-content: space-between; padding: 3px 8px; }
+.dx-field-name { color: #6d7690; }
+.dx-marked { background: #0e6b16; color: #eaffea; border-radius: 2px; }
+.dx-section-title { color: #f2f4fa; letter-spacing: 0.08em; padding: 12px 18px 0; }
