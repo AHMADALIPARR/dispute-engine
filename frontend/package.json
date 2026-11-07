@@ -1,1 +1,14 @@
-{"description":"MDX dispute console for the Sovereign Dispute Engine. Build check compiles the MDX and verifies the round contract against rounds/rounds.json.","devDependencies":{"@mdx-js/mdx":"^3.1.0"},"name":"dispute-engine-frontend","private":true,"scripts":{"check":"node build-check.mjs"},"version":"0.1.0"}
+{
+  "description": "Dispute console for the Sovereign Dispute Engine: MDX contract check, browser engine parity with the Julia program, and the static GitHub Pages shell.",
+  "devDependencies": {
+    "@mdx-js/mdx": "^3.1.0"
+  },
+  "name": "dispute-engine-frontend",
+  "private": true,
+  "scripts": {
+    "check": "node build-check.mjs",
+    "test": "node build-check.mjs && node integration.mjs && node smoke.mjs",
+    "test:browser": "node browser-check.mjs"
+  },
+  "version": "0.2.0"
+}

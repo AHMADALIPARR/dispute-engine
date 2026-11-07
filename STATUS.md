@@ -1,6 +1,9 @@
 # STATUS
 
-Local repository, not pushed. Built 2026-11-07.
+Repository: https://github.com/AHMADALIPARR/dispute-engine
+Pages (branch `main`, folder `/`): https://ahmadaliparr.github.io/dispute-engine/
+Built 2026-11-07. The console in this tree is not what that URL serves
+until the branch that adds `index.html` is merged to `main`.
 
 ## Sources
 
@@ -73,6 +76,25 @@ Local repository, not pushed. Built 2026-11-07.
 - The audit also gained his R05's sibling rule from this stage:
   missing_closure_date (closed account, no closure date). Sample
   round-0 failures are now 11; the console board matches.
+
+## Console on Pages (2026-11-07)
+
+- `index.html` is a static campaign console. GitHub Pages does not
+  run Julia. `frontend/site/engine.mjs` is the browser port.
+  `frontend/integration.mjs` compares it to
+  `julia engine/export_campaign.jl` (letters, counts, SHA-256 chain,
+  gate, CRM id). The committed seal is
+  `frontend/fixtures/engine-seal.json`.
+- The Julia reader now decodes JSON `\u` escapes. Sample account
+  references are bullets, matching `JSON.parse`.
+- Verified here: Julia 74/74, `node metro2/test.mjs` pass, frontend
+  contract 18/18, integration 23/23, smoke 33/33, headless Chrome
+  19/19. No request left 127.0.0.1. Catalog amount is still null.
+  The page does not mail, upload a report, or call Stripe.
+- CI: `.github/workflows/ci.yml`. A `v*` tag runs
+  `.github/workflows/release.yml` and opens a GitHub Release only
+  after tests pass. Pages updates from the merge to `main`, not
+  from the tag.
 
 ## Pricing model decision (owner, 2026-11-07)
 

@@ -13,7 +13,12 @@ r1 = parse_json(read(joinpath(root, "sample", "report-round1.json"), String))
     @test length(r0["tradelines"]) == 5
     @test r0["tradelines"][1]["fields"]["balance_owed"] == 4242
     @test r0["tradelines"][3]["certified"] == true
+    @test r0["tradelines"][1]["account_ref"] == "\u2022\u2022420"
+    @test parse_json("\"\\u2022\\u2022420\"") == "\u2022\u2022420"
+    @test parse_json("\"a\\nb\\t\\r\\b\\f\\\"\\\\/\"") == "a\nb\t\r\b\f\"\\/"
+    @test parse_json("\"\\uD83D\\uDE00\"") == "😀"
     @test_throws JSONParseError parse_json("{bad")
+    @test_throws JSONParseError parse_json("\"\\q\"")
 end
 
 @testset "audit: planted failures found, control clean" begin
@@ -72,6 +77,9 @@ end
     @test occursin("CFPB, FTC and my Attorney General", alltext)
     @test occursin("intentional disregard of my rights", alltext)
     @test occursin("permissible purpose", alltext)
+    @test occursin("\u2022\u2022420", result.board[1].letters_text[1])
+    @test !occursin("u2022", result.board[1].letters_text[1])
+    @test occursin(INQUIRY_DEMAND, alltext)
 end
 
 @testset "crm: the book keeps the practice" begin

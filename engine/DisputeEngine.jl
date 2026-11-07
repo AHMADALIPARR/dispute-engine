@@ -15,7 +15,8 @@ using SHA
 using Printf
 
 # ---------- minimal strict JSON reader (objects, arrays, strings,
-# numbers, booleans, null) ----------
+# numbers, booleans, null). String escapes match JSON.parse, including
+# \uXXXX, so a browser reading the same file gets the same text. ----------
 struct JSONParseError <: Exception
     msg::String
 end
@@ -105,6 +106,21 @@ function parse_array(p::Parser)
     end
 end
 
+function read_hex4(p::Parser)
+    hex = UInt32(0)
+    for _ in 1:4
+        p.i = nextind(p.s, p.i)
+        p.i > lastindex(p.s) && throw(JSONParseError("truncated unicode escape"))
+        h = p.s[p.i]
+        digit = h in '0':'9' ? UInt32(h) - UInt32('0') :
+                h in 'a':'f' ? UInt32(h) - UInt32('a') + 10 :
+                h in 'A':'F' ? UInt32(h) - UInt32('A') + 10 :
+                throw(JSONParseError("bad unicode escape"))
+        hex = (hex << 4) | digit
+    end
+    return hex
+end
+
 function parse_string(p::Parser)
     p.s[p.i] == '"' || throw(JSONParseError("expected string at $(p.i)"))
     p.i = nextind(p.s, p.i)
@@ -116,8 +132,40 @@ function parse_string(p::Parser)
             return String(take!(buf))
         elseif c == '\\'
             p.i = nextind(p.s, p.i)
+            p.i > lastindex(p.s) && throw(JSONParseError("bad escape at end of input"))
             e = p.s[p.i]
-            print(buf, e == 'n' ? '\n' : e == 't' ? '\t' : e == 'r' ? '\r' : e)
+            if e == 'u'
+                cp = read_hex4(p)
+                if 0xD800 <= cp <= 0xDBFF
+                    i1 = nextind(p.s, p.i)
+                    i2 = i1 <= lastindex(p.s) ? nextind(p.s, i1) : i1
+                    if i2 <= lastindex(p.s) && p.s[i1] == '\\' && p.s[i2] == 'u'
+                        p.i = i2
+                        low = read_hex4(p)
+                        0xDC00 <= low <= 0xDFFF || throw(JSONParseError("bad surrogate pair"))
+                        cp = 0x10000 + ((cp - 0xD800) << 10) + (low - 0xDC00)
+                    else
+                        throw(JSONParseError("lonely high surrogate"))
+                    end
+                elseif 0xDC00 <= cp <= 0xDFFF
+                    throw(JSONParseError("lonely low surrogate"))
+                end
+                print(buf, Char(cp))
+            elseif e == 'n'
+                print(buf, '\n')
+            elseif e == 't'
+                print(buf, '\t')
+            elseif e == 'r'
+                print(buf, '\r')
+            elseif e == 'b'
+                print(buf, '\b')
+            elseif e == 'f'
+                print(buf, '\f')
+            elseif e == '"' || e == '\\' || e == '/'
+                print(buf, e)
+            else
+                throw(JSONParseError("bad escape"))
+            end
             p.i = nextind(p.s, p.i)
         else
             print(buf, c)
@@ -251,6 +299,8 @@ const CERTIFY_DEMAND = "Appreciatively — You are violating my rights! I have l
 
 const ANTI_STALL_SHIELD = "I am aware that you have been sending out form letters in response to many of the disputes and challenges that consumers have submitted, regardless of the specific information that they have provided. This is illegal, as each dispute and challenge must be addressed individually and on its own merits. My letters were created using software that is available to everyone. If you don't process my letters, you are violating 15 U.S. Code § 1681i. Keep in mind, you are not allowed to delay processing letters from consumers based on the assumption that help from a third party may be available. This is not a legal exception! I am the author of any letters you receive with my name on them. Either I or my advisors wrote them with my full knowledge and consent. I am aware that there is no law that says you need to provide a Power of Attorney in order to delay processing letters from a consumer. If you do not process my letters in a timely manner, I will consider it to be an intentional disregard of my rights as a consumer. I will then contact my lawyer to take legal action."
 
+const INQUIRY_DEMAND = "I would like this removed or proof provided that you have permission to pursue this course of action under the Fair Credit Reporting Act. Please provide documentation showing compliance with FCRA guidelines. Please respond as soon as possible."
+
 function render_letter(consumer, bureau, targets, failures; frame = LETTER_FRAME, inquiries = FieldFailure[])
     io = IOBuffer()
     println(io, consumer)
@@ -276,7 +326,7 @@ function render_letter(consumer, bureau, targets, failures; frame = LETTER_FRAME
         println(io, "Inquiries")
         for fl in inquiries
             println(io, "  [MARKED] ", fl.detail, " [", fl.rule, "; ", fl.citation, "]")
-            println(io, "I would like this removed or proof provided that you have permission to pursue this course of action under the Fair Credit Reporting Act. Please provide documentation showing compliance with FCRA guidelines. Please respond as soon as possible.")
+            println(io, INQUIRY_DEMAND)
         end
     end
     println(io)

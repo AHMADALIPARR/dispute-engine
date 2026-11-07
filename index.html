@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sovereign Dispute Engine</title>
+  <meta name="description" content="Audit a credit-report JSON file in the browser with the same rules, letters, and hash chain as the Julia dispute engine. GitHub Pages only hosts these files. Nothing is mailed or uploaded.">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'">
+  <meta name="color-scheme" content="dark">
+  <link rel="stylesheet" href="frontend/site/app.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to the campaign console</a>
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Sovereign Dispute Engine</p>
+      <h1>Campaign console</h1>
+      <p class="lede">The audit runs in this browser from the same rules as <code>engine/DisputeEngine.jl</code>. GitHub Pages only delivers these files. It does not host a server, mail a letter, or call Stripe.</p>
+      <p class="pill" id="host-pill">Static page · nothing on this page is sent</p>
+    </div>
+    <figure class="poster">
+      <img src="assets/poster.webp" alt="Wireframe human figure with a blank face, above a painted Sign in with Facebook button and the labels Your Credit, Your Agent, and Your Life." width="280" height="420">
+      <figcaption>Pitch art from the repository. This page does not sign in to Facebook or any other network.</figcaption>
+    </figure>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="Console sections">
+      <a href="#how">How it runs</a>
+      <a href="#rounds">Rounds</a>
+      <a href="#reports">Reports</a>
+      <a href="#gate">Evidence gate</a>
+      <a href="#campaign">Campaign</a>
+      <a href="#letters">Draft letters</a>
+      <a href="#book">Client book</a>
+      <a href="#merchant">Merchant</a>
+      <a href="#chain">Verdict chain</a>
+    </nav>
+    <main id="main">
+      <noscript>
+        <p class="alert" role="alert">JavaScript is required to run the audit in this browser. Pages cannot run the Julia engine for you. Locally: <code>julia engine/DisputeEngine.jl</code>.</p>
+      </noscript>
+      <p id="boot-status" class="boot" role="status">Loading the engine seal and the synthetic sample reports…</p>
+      <p id="error" class="alert" role="alert" hidden></p>
+
+      <section class="panel" id="how" aria-labelledby="how-title">
+        <h2 id="how-title">How this page runs</h2>
+        <div class="prose">
+          <p>The authority is the Julia program in <code>engine/</code>. Continuous integration runs that program and compares it to <code>frontend/site/engine.mjs</code>. The committed file <code>frontend/fixtures/engine-seal.json</code> is the Julia output for the synthetic sample. When this page's sample campaign matches that file, the banner says so. Any other file is labeled as a browser session, not as a sealed run.</p>
+          <p>Reports you choose stay in this tab. They are not uploaded, stored, or turned into a message to a bureau, a furnisher, or Stripe. Draft letters download only if you ask. Mailing remains a separate human act. This is a document engine, not legal advice.</p>
+        </div>
+      </section>
+
+      <section class="panel" id="rounds" aria-labelledby="rounds-title">
+        <h2 id="rounds-title">Round control</h2>
+        <p class="prose">Each switch is that round's <code>enabled</code> flag for this session. The Julia program reads <code>rounds/rounds.json</code> on disk; these switches do not change the repository. A held round seals no letters. Field-level and per-failure rounds use the short letter frame. The long frames are selected only for tradeline-granularity rounds, by round order.</p>
+        <div id="round-list"></div>
+      </section>
+
+      <section class="panel" id="reports" aria-labelledby="reports-title">
+        <h2 id="reports-title">Report snapshots</h2>
+        <p class="prose">One JSON report per round, in order. The synthetic pair under <code>sample/</code> is loaded on open. Choosing files replaces that pair for this tab only. Limit 1 MB each.</p>
+        <div class="toolbar">
+          <label class="file" for="report-files">Load report JSON, in round order
+            <input id="report-files" type="file" accept="application/json,.json" multiple>
+          </label>
+          <button type="button" id="load-sample">Reload synthetic sample</button>
+          <button type="button" id="clear-session">Clear this tab</button>
+        </div>
+        <div id="report-list"></div>
+      </section>
+
+      <section class="panel" id="gate" aria-labelledby="gate-title">
+        <h2 id="gate-title">Evidence gate</h2>
+        <p class="prose">Same rule as <code>engine/EvidenceGate.jl</code>: a record is cleared for a draft only when a case status is <code>human_review_required</code>. Anything else is withheld. Produce the file locally with <code>node metro2/evaluate.mjs</code>. The dilute package's dry run matches nothing until independent evidence is entered. Record ids must be tradeline ids, or <code>INQ:</code> plus the creditor name. This page does not run a letter send.</p>
+        <div class="toolbar">
+          <label class="file" for="gate-file">Load evaluation JSON
+            <input id="gate-file" type="file" accept="application/json,.json">
+          </label>
+          <button type="button" id="gate-clear">Remove gate</button>
+        </div>
+        <p id="gate-status">No evidence file loaded. The press is not gated.</p>
+      </section>
+
+      <section class="panel" id="campaign" aria-labelledby="campaign-title">
+        <h2 id="campaign-title">Campaign</h2>
+        <div class="toolbar">
+          <button type="button" class="primary" id="run-campaign" disabled>Run campaign</button>
+        </div>
+        <p id="seal-status"></p>
+        <h3 id="verdict" tabindex="-1"></h3>
+        <div class="table-scroll" id="board"></div>
+        <div id="failure-list"></div>
+        <div id="exhibit"></div>
+      </section>
+
+      <section class="panel" id="letters" aria-labelledby="letters-title">
+        <h2 id="letters-title">Draft letters</h2>
+        <p class="prose">Addresses stay as <code>[CONSUMER ADDRESS]</code> and <code>[BUREAU ADDRESS]</code>. Nothing here is mailed, filed, or transmitted.</p>
+        <div class="toolbar">
+          <button type="button" id="download-letters" disabled>Download drafts (.txt)</button>
+          <button type="button" id="copy-letter" disabled>Copy selected draft</button>
+        </div>
+        <div id="letter-list"></div>
+        <pre id="letter-view" class="letter" tabindex="0">No campaign yet.</pre>
+      </section>
+
+      <section class="panel" id="book" aria-labelledby="book-title">
+        <h2 id="book-title">Client book</h2>
+        <p class="prose">A local book, same operations as <code>engine/CRM.jl</code>: client id, attached report ids, campaign counts, and an optional invoice memo. It lives in this tab's memory. Refreshing clears it. Stripe is not called. Do not type a social security number or a real account number into this page.</p>
+        <div class="book-fields">
+          <div>
+            <label for="client-name">Client name</label>
+            <input id="client-name" type="text" autocomplete="off" spellcheck="false" maxlength="200">
+          </div>
+          <div>
+            <label for="client-email">Email for the local id</label>
+            <input id="client-email" type="text" autocomplete="off" spellcheck="false" maxlength="200" inputmode="email">
+          </div>
+          <div>
+            <label for="invoice-memo">Invoice memo</label>
+            <input id="invoice-memo" type="text" autocomplete="off" maxlength="200" value="Local memo">
+          </div>
+          <div>
+            <label for="invoice-cents">Memo amount (cents)</label>
+            <input id="invoice-cents" type="number" inputmode="numeric" min="0" step="1">
+          </div>
+        </div>
+        <div class="toolbar">
+          <button type="button" id="use-sample-client">Use the synthetic sample client</button>
+          <button type="button" id="record-campaign" disabled>Record campaign in the local book</button>
+          <button type="button" id="add-invoice" disabled>Add local invoice memo</button>
+          <button type="button" id="download-book" disabled>Download book JSON</button>
+        </div>
+        <div id="book-body"><p>No local client yet.</p></div>
+      </section>
+
+      <section class="panel" id="merchant" aria-labelledby="merchant-title">
+        <h2 id="merchant-title">Merchant catalog</h2>
+        <div id="merchant-body"><p>Loading billing/billing.json…</p></div>
+      </section>
+
+      <section class="panel" id="chain" aria-labelledby="chain-title">
+        <h2 id="chain-title">Verdict chain</h2>
+        <p class="prose">Each line is <code>SHA-256(previous || "|" || record)</code>, the same construction as <code>seal!</code> in the Julia engine. The previous hash of the first line is <code>GENESIS</code>.</p>
+        <div class="toolbar">
+          <button type="button" id="chain-check" disabled>Re-check chain</button>
+          <button type="button" id="tamper-demo" disabled>Demonstrate a bad hash</button>
+          <button type="button" id="download-result" disabled>Download campaign JSON</button>
+        </div>
+        <p id="chain-status" role="status"></p>
+        <ol id="chain-log" class="chain"></ol>
+      </section>
+    </main>
+  </div>
+  <footer class="colophon">
+    <p>Synthetic samples only ship in this repository. Letters are drafts. The flat subscription in the catalog has no amount until it is set, and an unpriced plan sells nothing. PDF ingest is not implemented. Per-failure rounds with bureau-and-creditor scope emit two copies addressed to the bureau; field-granularity rounds of that scope also address the furnisher.</p>
+  </footer>
+  <script type="module" src="frontend/site/app.mjs"></script>
+</body>
+</html>

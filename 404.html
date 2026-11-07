@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dispute console</title>
+  <script>
+    (function () {
+      var path = location.pathname
+      var marker = '/dispute-engine/'
+      var at = path.indexOf(marker)
+      var root = at >= 0 ? path.slice(0, at + marker.length) : '/'
+      if (path !== root && path !== root + 'index.html') location.replace(root)
+    })()
+  </script>
+</head>
+<body>
+  <p><a id="home" href="/dispute-engine/">Open the dispute console</a></p>
+  <script>
+    (function () {
+      var path = location.pathname
+      var marker = '/dispute-engine/'
+      var at = path.indexOf(marker)
+      var root = at >= 0 ? path.slice(0, at + marker.length) : '/'
+      var link = document.getElementById('home')
+      if (link) link.setAttribute('href', root)
+    })()
+  </script>
+</body>
+</html>
