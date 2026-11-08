@@ -1,286 +1,143 @@
 # Sovereign Dispute Engine
 
-The owner's credit-repair algorithm, implemented as software and
-powered by the Sovereign Algorithm Engine pattern: ingest, audit,
-verdict, feedback, escalation.
+A local document-generation and credit-report auditing project with a static browser campaign console and an authoritative Julia implementation.
 
-The method never argues the debt. It audits the **record**. Every
-field of every tradeline must conform to the reporting standard
-(Metro 2) and to the bureau's statutory accuracy duty (FCRA). A
-field that cannot be proven conforming is marked; the marked fields
-become letters demanding documented proof of compliance or
-deletion; each round feeds the surviving failures back in at higher
-granularity until nothing unverifiable remains.
+**[Open the live console](https://ahmadaliparr.github.io/dispute-engine/)** · **[Source repository](https://github.com/AHMADALIPARR/dispute-engine)** · **[User guide](USER_GUIDE.md)**
 
-This is a document engine, not legal advice. It does not mail,
-file, or transmit a dispute.
+> This software produces draft documents, not legal advice or a determination that a debt is invalid. It does not mail, file, or transmit disputes. The hosted console does not accept payments. Review every claim and document before any separate human action.
+
+## Overview
+
+The engine reads structured credit-report JSON, applies its implemented audit rules, groups findings into configurable rounds, renders draft letters, and records campaign events in a SHA-256 hash chain. An optional evidence evaluation limits which marked records may produce drafts.
+
+The live site runs JavaScript in the browser; GitHub Pages serves static files. It does not execute Julia. The browser port compares its default synthetic campaign with a committed Julia-generated fixture. Matching that fixture is a specific sample comparison—not formal verification, legal validation, or assurance about arbitrary consumer files.
+
+## Capabilities and boundaries
+
+| Area | Implemented behavior | Boundary |
+| --- | --- | --- |
+| Audit | Required-field, verification, date, closure, terms, certification, remark, and inquiry checks | Project rules, not complete Metro 2 or FCRA compliance certification |
+| Campaigns | Ordered, switchable rounds with grouped or per-failure drafts | Runs consume available report snapshots; switches do not edit repository configuration |
+| Evidence | Accepts evaluation JSON; clears `human_review_required` records | Browser does not execute the Node evidence evaluator; status does not mean a human has approved a letter |
+| Draft export | Selected draft copying and combined text download | No PDF/HTML report ingest, PDF output workflow, or postal delivery |
+| Client book | Local client identifier, attached report IDs, campaign totals, invoice memos, JSON export | Tab memory; recording a campaign resets the browser book rather than appending to a durable CRM |
+| Billing | Displays the merchant catalog | Plan amount is unset; checkout disabled; no Stripe request |
+| Integrity | SHA-256 event-chain check and altered-hash demonstration | Not a digital signature, trusted timestamp, or independent proof of source facts |
+
+## Try it in your browser
+
+1. Open **[the live console](https://ahmadaliparr.github.io/dispute-engine/)** in a browser with JavaScript enabled.
+2. Wait for the synthetic reports and engine seal to load.
+3. Look for “Matches the Julia engine seal for the synthetic sample campaign.”
+4. Review **Round control**, **Report snapshots**, **Campaign**, and **Draft letters**.
+5. Select a draft, then use **Copy selected draft** or **Download drafts (.txt)** if needed.
+6. Use **Download campaign JSON** to save the computed result.
+
+Start with the supplied synthetic data. Do not enter social security numbers or full account numbers. See the [full walkthrough](USER_GUIDE.md#first-session-with-the-synthetic-sample) before loading other files.
 
 ## Architecture
 
-```
-credit-report JSON
-        |
-        v
-engine/DisputeEngine.jl          Julia stdlib. This is the authority.
-engine/EvidenceGate.jl           clears a record only for human review
-engine/CRM.jl                    local client book, hash-chained events
-        |
-        |  julia engine/export_campaign.jl
-        v
+```text
+JSON report snapshots + rounds/rounds.json
+               |
+               v
+engine/DisputeEngine.jl  -- campaign, audit rules, letter frames
+engine/EvidenceGate.jl   -- optional record clearance
+engine/CRM.jl            -- local book operations
+               |
+engine/export_campaign.jl
+               |
 frontend/fixtures/engine-seal.json
-        |
-        |  node frontend/integration.mjs   (must match, or CI fails)
-        v
-frontend/site/engine.mjs         same rules, letters, gate, book id, SHA-256 chain
-        |
-        v
-index.html                       static console
+               |
+frontend/site/engine.mjs -- browser port and parity comparison
+frontend/site/app.mjs    -- session UI, local file reads, downloads
+index.html              -- deployed static console
 ```
 
-GitHub Pages is already configured on this repository as **branch
-`main`, folder `/`** (legacy build). The public URL is
-<https://ahmadaliparr.github.io/dispute-engine/>. Pages copies files.
-It does not start Julia, Node, or a payment API. `.nojekyll` is at
-the repository root so the console is served as authored, and
-`404.html` sends any other path back to that root so a refresh does
-not depend on a server route.
+The separate `metro2/evaluate.mjs` evaluates independent-evidence predicates. The console consumes its evaluation output, not the evaluator itself. The MDX contract panel under `frontend/pages/` is checked during development but is not the deployed entry page.
 
-The browser cannot run this Julia program. The repository does not
-carry a WebAssembly sysimage or a Julia-to-WASM toolchain, and one
-was not added. `frontend/site/engine.mjs` is a port of
-`DisputeEngine.jl`, `EvidenceGate.jl`, and the client-id and summary
-operations in `CRM.jl`. Letter prose is not retyped there: the seal
-file contains the Julia constants (`LONG_FRAME`, `MASTER_FRAME`,
-`CRRG_FRAME`, `LETTER_FRAME`, the verdicts, the shield, and the
-inquiry demand). A sample run is labeled "Matches the Julia engine
-seal" only when the browser result equals `campaigns.sample` in
-that file. Every other run is labeled as a browser session.
+Useful source links: [Julia engine](https://github.com/AHMADALIPARR/dispute-engine/blob/main/engine/DisputeEngine.jl), [browser implementation](https://github.com/AHMADALIPARR/dispute-engine/blob/main/frontend/site/engine.mjs), [round configuration](https://github.com/AHMADALIPARR/dispute-engine/blob/main/rounds/rounds.json), [sample report](https://github.com/AHMADALIPARR/dispute-engine/blob/main/sample/report-round0.json), and [evidence workflow](https://github.com/AHMADALIPARR/dispute-engine/blob/main/metro2/README.md).
 
-`metro2/` stays the owner's dilute evaluator and still runs with
-Node (`node metro2/evaluate.mjs`). The page does not reimplement
-rules R01–R07. It accepts an evaluation JSON and applies the same
-clearance rule as `EvidenceGate.jl`: status
-`human_review_required` is cleared, and everything else is withheld.
+## Local setup
 
-Reports chosen in the browser stay in that tab. The page's content
-security policy is `default-src 'self'` with `connect-src 'self'`
-and `form-action 'none'`. Stripe.js is not loaded. There is no
-Facebook login, despite the pitch image.
+Obtain the repository through your normal GitHub download workflow and extract it. Run the following commands from its root unless a subshell explicitly changes directory.
 
-## The audit (engine/DisputeEngine.jl, Julia, zero dependencies)
+Development requirements follow the repository CI configuration: **Julia 1.11**, **Node.js 22**, and npm. The browser test additionally requires Chrome. The frontend contract check uses `@mdx-js/mdx`; install locked frontend dependencies with `npm ci`. The Julia engine uses standard-library code, not a separate package installation step.
 
-- **blank_required_field** — a required field reported blank.
-- **missing_verification** — never verified, or last verified before
-  the date reported.
-- **incoherent_remark** — the furnisher reports it cannot locate
-  the consumer while reporting an open balance.
-- **date_incoherence** — last activity predating the account opening.
-- **missing_closure_date** — a closed account with no closure date.
-- **stale_terms_on_closed** — a closed account still wearing live
-  payment terms.
-- **uncertified_tradeline** — content never certified to conform to
-  reporting standards.
-- **inquiry_without_permissible_purpose** — the second front: an
-  inquiry carrying no documented permissible purpose (FCRA § 604).
-
-The JSON reader decodes standard string escapes, including `\uXXXX`
-and surrogate pairs, so a browser `JSON.parse` of the same file
-yields the same text. Sample account references written as
-`\u2022\u2022` are bullets in both places.
-
-## The rounds (rounds/rounds.json — one contract, two readers)
-
-1. **Round Kick Regular** — one letter per bureau, every failure.
-2. **Nerve Boosted** — one letter per failing tradeline.
-3. **Punch of Fury Supreme** — bureau and furnisher served together.
-4. **Paralyzing Touch Point Supreme** — every failure its own letter.
-   This round is held out in the file (`enabled: false`).
-
-Tradeline-granularity rounds pick a frame by round order: order 1
-the long frame, order 2 the master frame, order 3 the CRRG frame,
-anything else the short frame. Field and per-failure rounds use the
-short frame. A per-failure round whose scope is `bureau-and-creditor`
-emits two copies, both addressed to the bureau. A field round with
-that scope addresses the bureau and then the furnisher. Inquiries
-are written into letters on tradeline-granularity rounds.
-
-Letters use the owner's structure: the round's frame, one block per
-account with its marked fields and per-account verdict, the
-certification demand (CFPB, FTC, Attorney General), and the closing
-shield (§ 1681i; authorship declared; no power-of-attorney delay).
-Addresses stay `[CONSUMER ADDRESS]` and `[BUREAU ADDRESS]`. Every
-round seals into a SHA-256 hash chain whose first previous value is
-`GENESIS`.
-
-## The console
-
-Two surfaces read the same round file:
-
-- `frontend/pages/dispute-console.mdx` is the contract panel (campaign
-  board, round toggles, marked exhibit, book, merchant). `npm run
-  check` compiles it and checks the contract. It is not the deployed
-  page.
-- `index.html` is the page Pages will serve. It loads the synthetic
-  samples, runs the port, and compares the result to the seal. Round
-  switches affect this tab only. A local report JSON (1 MB limit)
-  can replace the sample. An evaluation JSON can gate the press.
-  Drafts can be copied or downloaded. The client book and any
-  invoice memo stay in tab memory. Checkout stays disabled: the
-  catalog amount is null, and this page cannot call Stripe.
-
-The pitch names a $97 monthly fee. `billing/billing.json` still has
-`amount_cents: null`. An unpriced plan sells nothing. The page says
-that, and it does not invent a charge.
-
-## The book and the rail
-
-`engine/CRM.jl` is the client book: clients, their reports,
-campaigns, letters, and invoices, kept locally with every event
-sealed into the verdict chain. `billing/billing.json` is the
-merchant catalog: Stripe is the recorded processor (customers,
-subscriptions, checkout, invoices) and mirrors **into** the book —
-the book is the record, the rail is replaceable. Prices are set in
-the catalog by the owner; an unpriced item sells nothing. No Stripe
-secret is stored in this repository.
-
-The sample client id is `C` plus the first 8 hex characters of
-SHA-256(`SAMPLE CONSUMER` + `sample@example.com`). The console shows
-that id only for that synthetic pair, and says when a local id is
-not the sealed one.
-
-## The evidence gate
-
-`metro2/` is the owner's dilute Metro 2 evaluator, included
-verbatim: rules that fire only on independent evidence, human
-review before any letter. `engine/EvidenceGate.jl` bridges it in
-front of the press — pass a dilute evaluation to the campaign and
-only cleared records render. The concentrated engine proposes;
-the dilute engine disposes. The package dry run has
-`matched_count: 0` until evidence is entered. Its record ids
-(`edu_01`, and so on) are not the sample tradeline ids (`T1`, …),
-so pointing the sample campaign at that dry run clears nothing.
-That is a withheld campaign, not a successful dispute.
-
-## Running
-
-Requirements: Julia 1.11 (tested on 1.11.3) and Node.js 22.
-The frontend dev dependency is `@mdx-js/mdx`, used only by the
-contract check. No Python. The Pages page itself is HTML, CSS, and
-JavaScript and needs no install to open.
-
+```sh
+# Start the local static console; stop with Ctrl+C.
+node frontend/serve.mjs
+# Open http://127.0.0.1:4173/
 ```
+
+There is no `npm run build` script in the inspected package. Static hosting serves the committed files. Opening `index.html` directly with a `file://` URL is not the recommended workflow because the console fetches adjacent JSON resources.
+
+### Run the Julia engine
+
+```sh
 julia engine/DisputeEngine.jl
 julia engine/export_campaign.jl
 julia engine/export_campaign.jl sample/report-round0.json sample/report-round1.json
 julia engine/export_campaign.jl --gate frontend/fixtures/gate-sample.json sample/report-round0.json
+```
+
+### Run the evidence evaluator
+
+```sh
+node metro2/evaluate.mjs metro2/dilute_metro2_package.json metro2/evaluation_dry_run.json
+```
+
+This command writes the named evaluation file. The supplied package has no matching independent evidence in its dry run; that is not a verified dispute. Its record identifiers also differ from the sample campaign's identifiers.
+
+## Tests and verification
+
+```sh
 julia test/runtests.jl
 node metro2/test.mjs
-node metro2/evaluate.mjs metro2/dilute_metro2_package.json metro2/evaluation_dry_run.json
-cd frontend && npm ci && npm test
-node frontend/browser-check.mjs          # Chrome; writes screenshots
-node frontend/serve.mjs                  # http://127.0.0.1:4173/
+(cd frontend && npm ci && npm test)
+node frontend/browser-check.mjs
 ```
 
-`npm test` is the MDX contract check, the Julia-versus-browser
-parity test, and the static smoke test. Refresh the committed seal
-after an intentional engine change with:
+`npm test` runs the MDX contract check, Julia/browser integration comparison, and static smoke checks. Julia must be available for parity testing. The browser suite is also exposed as `npm run test:browser` inside `frontend/`.
 
-```
+After an intentional engine change, maintainers can regenerate the committed seal:
+
+```sh
 node frontend/integration.mjs --write
 ```
 
-CI runs that comparison without `--write`, so a drifted seal fails.
-Ingest format is the credit-report JSON export. Sample reports under
-`sample/` are synthetic. Do not put a real social security number,
-full account number, or live consumer file in the repository or in
-a download you then commit.
+Review the fixture diff; do not regenerate it merely to conceal a mismatch. Normal comparison runs omit `--write`.
 
-## Testing
+**Documentation validation status:** source files and the public page were inspected for this documentation. Application suites, Julia execution, browser interactions, and benchmarks were **not executed** during preparation. No inherited pass counts are asserted here. Inspect [CI runs](https://github.com/AHMADALIPARR/dispute-engine/actions) for commit-specific results.
 
-Verified on Julia 1.11.3, Node 22, and headless Chrome:
+## Hosting and operations
 
-| Command | Result |
-| --- | --- |
-| `julia test/runtests.jl` | 74 passed: JSON reader 10, audit 19, campaign 20, CRM 10, evidence gate 8, billing 5, verdict chain 2 |
-| `node metro2/test.mjs` | pass (missing evidence stays unmatched; proof can require human review; accounts stay isolated) |
-| `node frontend/build-check.mjs` | 18/18 |
-| `node frontend/integration.mjs` | 23/23, including letter text, hashes, punch, per-failure, resolved, empty rounds, and the sample client id |
-| `node frontend/smoke.mjs` | 33/33, including relative asset paths, the content security policy, the seal, an unpriced catalog, and a secret/SSN scan of the console files |
-| `node frontend/browser-check.mjs` | 19/19: sealed sample, round toggle, invalid JSON clears the board, a gate that clears nothing, a clean report resolves, local book id, tamper refused, no request left 127.0.0.1 |
+The repository is structured for GitHub Pages at `/dispute-engine/`, using root `index.html`, relative resources, `.nojekyll`, and a root `404.html`. The public page currently presents the campaign console. Confirm actual Pages configuration in repository settings before changing hosting; documentation is not a settings audit.
 
-The browser check writes:
+The [CI workflow](https://github.com/AHMADALIPARR/dispute-engine/blob/main/.github/workflows/ci.yml) defines engine, evaluator, frontend, and Chrome checks. The repository also contains a [release workflow](https://github.com/AHMADALIPARR/dispute-engine/blob/main/.github/workflows/release.yml). A release and a Pages deployment are separate concerns.
 
-- `dispute-console-desktop.png`
-- `dispute-console-campaign.png`
-- `dispute-console-letter.png`
-- `dispute-console-error.png`
-- `dispute-console-mobile.png`
+Before publishing changes, review tests, sample-seal parity, relative resource loading at the project URL, draft text, and the browser's privacy statements. Production use additionally requires appropriate legal review, operational controls, secure data handling, and independent security assessment; this README does not certify production readiness.
 
-## Deployment
+## Privacy and data retention
 
-Production hosting is the existing GitHub Pages setting: **Deploy
-from branch `main`, folder `/`**. There is no second host and no
-GitHub Actions deploy that could race that setting.
+The inspected console reads selected files using browser `FileReader`, keeps reports and its client book in JavaScript memory, and implements local downloads. It does not implement report uploads, browser-book persistence, authentication, or a book restore workflow. Refreshing loses session state. Recording another campaign replaces the current local book; export first if you need it.
 
-What is live today: <https://ahmadaliparr.github.io/dispute-engine/>
-returns the Jekyll rendering of `main` (HTTP 200). It does not serve
-this console. Checked before this branch: the body has no
-"Campaign console".
+Static page and asset requests still reach the hosting service. Browser extensions, operating-system access, clipboard history, downloaded files, and backups remain outside the application's in-memory boundary. Do not interpret “nothing is sent” as a universal privacy guarantee. Never commit consumer files, exported campaigns, or private evidence to the public repository.
 
-What publishes the console: merging this branch to `main`. Pages
-will then serve `index.html`, the engine script, the seal, the
-samples, and the rounds file from that commit. After the Pages build
-finishes, confirm both of these on the live URL:
+## Known limitations
 
-- the amber line "Static page · nothing on this page is sent"
-- the sentence "Matches the Julia engine seal for the synthetic sample campaign."
+- JSON input only; no report PDF or HTML parser.
+- Browser report limit: 1,000,000 bytes per selected file and at most 500 tradelines per report.
+- Enabled rounds pair with reports by list position, not by report ID or date; execution stops when reports run out or an early verdict ends the campaign.
+- Inquiry letters are included in tradeline-granularity rounds, not field/per-failure branches.
+- Per-failure `bureau-and-creditor` rounds currently emit two bureau-addressed copies; field-granularity rounds address bureau and furnisher separately.
+- Drafts retain address placeholders and require independent factual/legal review.
+- Invoice memos are not charges, receipts, or subscriptions.
 
-`.github/workflows/ci.yml` runs the Julia suite, the dilute suite,
-`npm test`, and the browser check on every push and pull request.
-`.github/workflows/release.yml` runs the same tests (without Chrome)
-on a tag `v*` and, only if they pass, creates a GitHub Release with
-generated notes. Tag after the merge, from `main`:
+## Contributing and support
 
-```
-git checkout main
-git pull
-git tag v0.2.0
-git push origin v0.2.0
-```
-
-The tag does not change which files Pages serves. The merge does.
-This branch does not merge itself and does not push the tag.
-
-## Limitations
-
-- Ingest is JSON. PDF and HTML report parsing are not implemented.
-- Letters are drafts with address placeholders. Nothing is mailed.
-- The audit encodes the owner's dispute rules. It is not legal advice.
-- A browser session is not the Julia process. Trust the seal banner
-  for the sample, and `julia engine/export_campaign.jl` for a file
-  you care about.
-- Lone UTF-16 surrogates are rejected. Escaped surrogate pairs decode.
-- The dilute evaluator is Node-only. The page only filters a file
-  it is given.
-- The merchant catalog is unpriced. The page cannot take a card.
-- The client book is tab memory. Refresh clears it.
-- Sample data is synthetic. Do not commit a real consumer report.
-
-## Release notes
-
-### 0.2.0 — Pages console
-
-- Static campaign console at `index.html`, wired to a browser port
-  of the Julia engine and checked against `engine/export_campaign.jl`.
-- Engine seal for the synthetic sample, the evidence-gate cases,
-  punch, per-failure, a clean report, and an empty round list.
-- JSON `\u` escapes, including surrogate pairs, now decode in the
-  Julia reader. Sample account references render as bullets.
-- Content security policy, relative asset paths, and a root
-  `404.html` for the existing Pages project URL.
-- CI workflow and a tag-triggered GitHub Release workflow.
-- No Stripe call, no mailed dispute, and no new price in the catalog.
+Review the [user guide](USER_GUIDE.md), reproduce issues with synthetic inputs, and include the commit, environment, steps, and expected versus actual behavior when opening a [repository issue](https://github.com/AHMADALIPARR/dispute-engine/issues). Remove consumer information from logs and screenshots. Preserve the distinction between proposed findings, evidence-gated records, and reviewed documents.
 
 ## License
 
-See `LICENSE` (LicenseRef-Sovereign-Leviathan-SL-AGPL3-001).
+Read the full [repository LICENSE](https://github.com/AHMADALIPARR/dispute-engine/blob/main/LICENSE) before reuse or deployment. Its identifier is `LicenseRef-Sovereign-Leviathan-SL-AGPL3-001` and its text includes custom terms. Do not infer standard AGPL-only or unrestricted open-source licensing from the identifier.
