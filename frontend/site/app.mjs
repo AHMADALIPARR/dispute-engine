@@ -380,18 +380,23 @@ function renderMerchant() {
   }
   const plan = (billing.plans || [])[0]
   const amount = plan ? plan.amount_cents : null
+  const link = plan ? plan.stripe_payment_link_url : null
   const price = amount == null
     ? 'Amount not set. An unpriced plan sells nothing.'
-    : `Catalog amount ${formatUsdFromCents(amount)}. This static page still cannot start checkout.`
+    : `Catalog amount ${formatUsdFromCents(amount)}.`
   host.append(el('div', { class: 'prose' }, [
     el('p', {}, `Processor recorded in the catalog: ${billing.merchant?.processor || 'unknown'}. Catalog state: ${billing.merchant?.state || 'unknown'}.`),
     el('p', {}, plan ? `${plan.name} · ${plan.interval || 'once'}. ${price}` : 'No plan is in the catalog.'),
-    el('p', {}, 'Stripe.js is not loaded. This page cannot create a customer, a subscription, or a charge. The book is the record; the rail is not called from GitHub Pages.'),
+    el('p', {}, link
+      ? 'Checkout runs on Stripe\'s hosted page: this page links out and never sees a card, and makes no Stripe request itself. The catalog link is Stripe TEST mode — a test checkout; no real money moves. The book is the record.'
+      : 'Stripe.js is not loaded and no checkout link is in the catalog. This page cannot create a customer, a subscription, or a charge. The book is the record; the rail is not called from GitHub Pages.'),
   ]))
   host.append(el('div', { class: 'toolbar' }, [
-    el('button', { type: 'button', id: 'checkout', disabled: true }, amount == null
-      ? 'Checkout unavailable — unpriced plan sells nothing'
-      : 'Checkout unavailable on this static page'),
+    link
+      ? el('a', { id: 'checkout', class: 'checkout-link', href: link, target: '_blank', rel: 'noopener' }, `Subscribe — ${formatUsdFromCents(amount)} / month · test checkout`)
+      : el('button', { type: 'button', id: 'checkout', disabled: true }, amount == null
+        ? 'Checkout unavailable — unpriced plan sells nothing'
+        : 'Checkout unavailable on this static page'),
   ]))
 }
 

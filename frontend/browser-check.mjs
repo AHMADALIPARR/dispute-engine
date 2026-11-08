@@ -148,12 +148,13 @@ try {
   check('sample verdict is held', body.includes('Verdict: HELD -> escalate'))
   check('sample board shows 11 failures and 2 drafts on round one', body.includes('Round Kick Regular') && body.includes('11'))
   check('sample says nothing was sent', body.includes('Nothing was sent'))
-  check('checkout is unavailable', body.includes('Checkout unavailable') && body.includes('sells nothing'))
+  check('checkout is labelled test mode', body.includes('test checkout') && body.includes('TEST mode'))
   const checkout = await send('Runtime.evaluate', {
-    expression: `(() => { const node = document.querySelector('#checkout'); return node ? node.disabled : null })()`,
+    expression: `(() => { const node = document.querySelector('#checkout'); return node ? { tag: node.tagName, href: node.getAttribute('href') || '', disabled: node.disabled === true } : null })()`,
     returnByValue: true,
   })
-  check('checkout control is disabled', checkout.result.value === true)
+  const co = checkout.result.value
+  check('checkout control is a live stripe link', !!co && co.tag === 'A' && co.href.includes('buy.stripe.com/test_') && co.disabled === false)
   await shot(send, 'dispute-console-desktop.png')
   await scrollTo(send, '#campaign')
   await shot(send, 'dispute-console-campaign.png')

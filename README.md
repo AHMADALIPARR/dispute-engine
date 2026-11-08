@@ -21,7 +21,7 @@ The live site runs JavaScript in the browser; GitHub Pages serves static files. 
 | Evidence | Accepts evaluation JSON; clears `human_review_required` records | Browser does not execute the Node evidence evaluator; status does not mean a human has approved a letter |
 | Draft export | Selected draft copying and combined text download | No PDF/HTML report ingest, PDF output workflow, or postal delivery |
 | Client book | Local client identifier, attached report IDs, campaign totals, invoice memos, JSON export | Tab memory; recording a campaign resets the browser book rather than appending to a durable CRM |
-| Billing | Displays the merchant catalog | Plan amount is unset; checkout disabled; no Stripe request |
+| Billing | Displays the merchant catalog; checkout links out to Stripe's hosted page | $97.00/month flat; the catalog link is Stripe test mode; the page itself makes no Stripe request |
 | Integrity | SHA-256 event-chain check and altered-hash demonstration | Not a digital signature, trusted timestamp, or independent proof of source facts |
 
 ## Try it in your browser

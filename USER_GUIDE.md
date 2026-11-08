@@ -26,7 +26,7 @@ A report snapshot is a structured JSON document describing a consumer, report id
 
 A marked field is not itself proof of a statutory violation. Missing evidence, an import mistake, an outdated snapshot, and an actual reporting problem are different situations. Likewise, a program verdict is not a bureau decision, a court finding, an account deletion, or a change to a credit score. The console does not fetch current bureau records or observe what happens after a letter leaves your device.
 
-The browser book is temporary session bookkeeping. The merchant panel displays catalog information but cannot collect payment. There is no account registration, Facebook authentication, Stripe checkout, dispute submission, or background mailing service in the inspected console. The artwork's painted sign-in button is not an implemented sign-in workflow.
+The browser book is temporary session bookkeeping. The merchant panel displays the catalog and links out to Stripe's hosted checkout (test mode); the page itself collects no payment and makes no Stripe request. There is no account registration, Facebook authentication, dispute submission, or background mailing service in the inspected console. The artwork's painted sign-in button is not an implemented sign-in workflow.
 
 ## First session with the synthetic sample
 
@@ -119,7 +119,7 @@ Importantly, recording a campaign currently starts a new empty browser book and 
 
 To demonstrate a memo, enter text in **Invoice memo** and a whole, nonnegative number in **Memo amount (cents)**, then click **Add local invoice memo**. An amount of `2500` represents twenty-five dollars, not twenty-five hundred dollars. The summary shows an open memo balance. That number is local bookkeeping only: no card is charged, no invoice is emailed, and no Stripe customer or subscription is created.
 
-Use **Download book JSON** to save `client-book-session.json`. This exports the current book, not a full durable application account or a supported restore package. The interface has no book-import button. The **Merchant catalog** remains informational, with checkout unavailable; setting a catalog amount would not turn this static page into a payment system.
+Use **Download book JSON** to save `client-book-session.json`. This exports the current book, not a full durable application account or a supported restore package. The interface has no book-import button. The **Merchant catalog** shows the plan and links out to Stripe's hosted checkout page (the catalog link is Stripe test mode); this page is not a payment system and never handles a card.
 
 ## Checking the verdict chain
 

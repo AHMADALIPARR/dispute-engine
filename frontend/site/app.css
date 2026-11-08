@@ -383,3 +383,16 @@ th { color: var(--muted); font-weight: 600; }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition: none !important; }
 }
+
+/* The checkout control is a link out to Stripe's hosted page,
+   styled as the panel's buttons. */
+.checkout-link {
+  display: inline-block;
+  padding: 7px 14px;
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  color: #e7fff2;
+  text-decoration: none;
+  font: inherit;
+}
+.checkout-link:hover { border-color: var(--muted); }
