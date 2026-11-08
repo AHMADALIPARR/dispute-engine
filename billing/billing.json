@@ -1,1 +1,29 @@
-{"merchant":{"processor":"stripe","state":"connected","stripe_objects":{"customers":"Stripe Customers mirrored 1:1 from CRM clients (CRM is the source of truth)","invoices":"Stripe Invoices mirrored INTO CRM invoice records","plans":"Stripe Products + Prices created from the plans below","subscriptions":"Stripe Billing subscriptions for active plans"}},"money":{"currency":"usd","note":"One flat fee, subscription basis — the owner's model decision 2026-11-07. Owner named the fee in chat 2026-11-07T21:21:37Z: $97/month flat (9700 cents). Stripe product+price creation still pending — no Stripe IDs recorded yet; products stays empty until the create calls land and their IDs are mirrored here."},"plans":[{"amount_cents":9700,"description":"The whole dispute engine on one flat subscription: report ingest, the conformance audit, the evidence gate, the escalation rounds, generated letters, and the client book. No per-round credits, no tiers.","id":"dispute-engine-flat","interval":"month","name":"Dispute Engine — Flat Subscription","stripe":"product+price (subscription)"}],"products":[]}
+{
+ "merchant": {
+  "processor": "stripe",
+  "state": "connected",
+  "stripe_objects": {
+   "customers": "Stripe Customers mirrored 1:1 from CRM clients (CRM is the source of truth)",
+   "invoices": "Stripe Invoices mirrored INTO CRM invoice records",
+   "plans": "Stripe Products + Prices created from the plans below",
+   "subscriptions": "Stripe Billing subscriptions for active plans"
+  }
+ },
+ "money": {
+  "currency": "usd",
+  "note": "One flat fee, subscription basis \u2014 the owner's model decision 2026-11-07. Fee named by the owner: $97/month flat (9700 cents). Stripe product+price CREATED 2026-11-07 in the connected sandbox account (livemode false): prod_VaUhDJ8ifU23F3 / price_1UZJi9RUSPgRfKac2PpFasGY, verified by read-back (9700 usd, monthly). Live-mode objects are a separate creation once the account's live side is activated."
+ },
+ "plans": [
+  {
+   "amount_cents": 9700,
+   "description": "The whole dispute engine on one flat subscription: report ingest, the conformance audit, the evidence gate, the escalation rounds, generated letters, and the client book. No per-round credits, no tiers.",
+   "id": "dispute-engine-flat",
+   "interval": "month",
+   "name": "Dispute Engine \u2014 Flat Subscription",
+   "stripe": "product+price (subscription)",
+   "stripe_price_id": "price_1UZJi9RUSPgRfKac2PpFasGY",
+   "stripe_product_id": "prod_VaUhDJ8ifU23F3"
+  }
+ ],
+ "products": []
+}
