@@ -21,6 +21,8 @@
    "interval": "month",
    "name": "Dispute Engine \u2014 Flat Subscription",
    "stripe": "product+price (subscription)",
+   "stripe_payment_link_id": "plink_1UZK92RUSPgRfKacoFjNVz1e",
+   "stripe_payment_link_url": "https://buy.stripe.com/test_bJecN70Pj45Zap5g4SdjO00",
    "stripe_price_id": "price_1UZJi9RUSPgRfKac2PpFasGY",
    "stripe_product_id": "prod_VaUhDJ8ifU23F3"
   }
